@@ -1,0 +1,37 @@
+{
+  "sheets": [
+    {
+      "id": "mdf-5-60x40-a",
+      "material": "mdf",
+      "thicknessMm": 5,
+      "widthCm": 60,
+      "heightCm": 40,
+      "quantity": 2,
+      "note": "Standard MDF Platte"
+    },
+    {
+      "id": "mdf-8-80x50-a",
+      "material": "mdf",
+      "thicknessMm": 8,
+      "widthCm": 80,
+      "heightCm": 50,
+      "quantity": 1
+    },
+    {
+      "id": "multiplex-5-70x45-a",
+      "material": "multiplex",
+      "thicknessMm": 5,
+      "widthCm": 70,
+      "heightCm": 45,
+      "quantity": 1
+    },
+    {
+      "id": "acryl-3-50x30-a",
+      "material": "acryl",
+      "thicknessMm": 3,
+      "widthCm": 50,
+      "heightCm": 30,
+      "quantity": 3
+    }
+  ]
+}

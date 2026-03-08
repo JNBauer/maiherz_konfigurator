@@ -18,6 +18,57 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
+## Workshop Material Inventory
+
+Material availability in the configurator is driven by:
+
+- `data/workshop-materials.json`
+
+Each entry in `sheets` is one stock item:
+
+```json
+{
+  "id": "mdf-5-60x40-a",
+  "material": "mdf",
+  "thicknessMm": 5,
+  "widthCm": 60,
+  "heightCm": 40,
+  "quantity": 2,
+  "note": "optional text"
+}
+```
+
+Allowed `material` values:
+
+- `mdf`
+- `multiplex`
+- `acryl`
+
+How availability works:
+
+- A material/thickness is selectable only if at least one sheet with `quantity > 0` can fit the configured sign area (`widthCm * heightCm`).
+- If a currently selected option becomes unavailable, the UI auto-switches to the first available option.
+
+## Pricing Configuration
+
+Price estimation in `Kostenvoranschlag` is driven by:
+
+- `data/pricing-config.json`
+
+Main sections:
+
+- `materialRates`: price per square meter by material + thickness
+- `laserCutting`: setup fee, per-cm2 fee, per-letter fee, minimum fee
+- `delivery.methods`: selectable delivery methods with flat fees
+- `delivery.freeFromSubtotal`: free shipping threshold (except pickup)
+- `vatPercent`: VAT rate applied to net total
+
+Example material rate entry:
+
+```json
+{ "material": "mdf", "thicknessMm": 5, "pricePerM2": 52 }
+```
+
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
 ## Learn More
