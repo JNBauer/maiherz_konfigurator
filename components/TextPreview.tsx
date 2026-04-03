@@ -411,7 +411,7 @@ export default function TextPreview() {
 
   useEffect(() => {
     const heartKeys = heartMaterialOptions.map((option) => option.key)
-    if (!heartKeys.includes(heartMaterial)) {
+    if (!heartKeys.includes(heartMaterial as (typeof heartKeys)[number])) {
       setHeartMaterial(heartKeys[0] ?? "mdf")
     }
   }, [heartMaterial, heartMaterialOptions])
@@ -601,20 +601,43 @@ export default function TextPreview() {
                     (laserMarker && !laserSafety?.isSafe))) && (
                   <group>
                     {heartBorderPoints.length > 1 && (
-                      <line
-                        geometry={new THREE.BufferGeometry().setFromPoints(
-                          heartBorderPoints
-                        )}
-                      >
+                      <line>
+                        <bufferGeometry attach="geometry">
+                          <bufferAttribute
+                            attach="attributes-position"
+                            args={[
+                              new Float32Array(
+                                heartBorderPoints.flatMap((point) => [
+                                  point.x,
+                                  point.y,
+                                  point.z,
+                                ])
+                              ),
+                              3,
+                            ]}
+                          />
+                        </bufferGeometry>
                         <lineBasicMaterial color="#ffb020" />
                       </line>
                     )}
 
                     {textBorderPoints.map((polyline, idx) => (
-                      <line
-                        key={`text-border-${idx}`}
-                        geometry={new THREE.BufferGeometry().setFromPoints(polyline)}
-                      >
+                      <line key={`text-border-${idx}`}>
+                        <bufferGeometry attach="geometry">
+                          <bufferAttribute
+                            attach="attributes-position"
+                            args={[
+                              new Float32Array(
+                                polyline.flatMap((point) => [
+                                  point.x,
+                                  point.y,
+                                  point.z,
+                                ])
+                              ),
+                              3,
+                            ]}
+                          />
+                        </bufferGeometry>
                         <lineBasicMaterial color="#6ee7ff" />
                       </line>
                     ))}
