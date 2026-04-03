@@ -1,87 +1,40 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Maiherz Name Configurator
 
-## Getting Started
+A web-based configurator for designing a personalized wooden "Maiherz" sign: a heart shape with a custom name on top. It supports multiple heart variants, typography, sizes, materials, and engraving options, all shown in a realistic 3D workbench scene.
 
-First, run the development server:
+The focus is on the design experience, not checkout. Users configure their piece and send an order request with their chosen settings and a production-ready SVG that can be used for laser cutting. The goal is to connect a playful, visual customization tool with a practical workshop workflow.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+This project is inspired by the "Maiherzen" custom around the Rhineland, where decorated hearts are given on the first of May.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Core ideas:
+- Intuitive, visual customization of a heart + name layout
+- Real-world sizing tied to a physical scale in the scene
+- Design checks for laser feasibility (safety margins, thin spots)
+- Multiple heart shape variants and material options
+- A clean handoff to manual production via email + SVG
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## What It Does
 
-## Workshop Material Inventory
+- Live 3D preview of the heart + text composition
+- Size controls mapped to real-world centimeters
+- Safety checks that flag text too close to the heart edge
+- Laser readiness checks for thin stroke distances
+- Export-ready SVG sent with the customer request
 
-Material availability in the configurator is driven by:
+## Acknowledgements
 
-- `data/workshop-materials.json`
+Fonts:
+- Borel
+- Cherry Bomb One
+- Dancing Script
+- Geist
+- Geist Mono
+- Josefin Sans
+- Lobster
 
-Each entry in `sheets` is one stock item:
+Textures and images:
+- Birch log header image in `public/birkenstamm.png`
+- Workshop HDRs in `public/hdri/`
 
-```json
-{
-  "id": "mdf-5-60x40-a",
-  "material": "mdf",
-  "thicknessMm": 5,
-  "widthCm": 60,
-  "heightCm": 40,
-  "quantity": 2,
-  "note": "optional text"
-}
-```
-
-Allowed `material` values:
-
-- `mdf`
-- `multiplex`
-- `acryl`
-
-How availability works:
-
-- A material/thickness is selectable only if at least one sheet with `quantity > 0` can fit the configured sign area (`widthCm * heightCm`).
-- If a currently selected option becomes unavailable, the UI auto-switches to the first available option.
-
-## Pricing Configuration
-
-Price estimation in `Kostenvoranschlag` is driven by:
-
-- `data/pricing-config.json`
-
-Main sections:
-
-- `materialRates`: price per square meter by material + thickness
-- `laserCutting`: setup fee, per-cm2 fee, per-letter fee, minimum fee
-- `delivery.methods`: selectable delivery methods with flat fees
-- `delivery.freeFromSubtotal`: free shipping threshold (except pickup)
-- `vatPercent`: VAT rate applied to net total
-
-Example material rate entry:
-
-```json
-{ "material": "mdf", "thicknessMm": 5, "pricePerM2": 52 }
-```
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+3D models:
+- Workbench scene model in `public/models/`
