@@ -1,8 +1,8 @@
-Maiherz Name Configurator
+# Maiherz Name Configurator
 
 A web-based configurator for designing a personalized wooden "Maiherz" sign: a heart shape with a custom name on top. It supports multiple heart variants, typography, sizes, materials, and engraving options, all shown in a realistic 3D workbench scene.
 
-The focus is on the design experience, not checkout. Users configure their piece and send an order request with their chosen settings and a production-ready SVG that can be used for laser cutting. The goal is to connect a playful, visual customization tool with a practical workshop workflow.
+The focus is on the design experience. Users configure their piece and send an order request with their chosen settings and a production-ready SVG that can be used for laser cutting. The goal is to connect a playful, visual customization tool with a practical workshop workflow.
 
 This project is inspired by the "Maiherzen" custom around the Rhineland, where decorated hearts are given on the first of May.
 
