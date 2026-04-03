@@ -40,4 +40,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-.gbl
+*.gbl
+*Zone.Identifier
+*:Zone.Identifier

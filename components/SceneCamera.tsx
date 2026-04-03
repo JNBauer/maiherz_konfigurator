@@ -11,19 +11,29 @@ type SceneCameraProps = {
   onDebugChange?: (state: CameraDebugState) => void
 }
 
+// Temporary: unlock camera constraints while locating the scene.
+const DEBUG_UNLOCK_CONTROLS = false
+
 // Fine-tune camera behavior here.
 const CAMERA_SETTINGS = {
-  minDistance: 0.5,
-  maxDistance: 1.5,
+  minDistance: DEBUG_UNLOCK_CONTROLS ? 0.05 : 0.5,
+  maxDistance: DEBUG_UNLOCK_CONTROLS ? 100 : 1.0,
   minPolarAngle: 0,
-  maxPolarAngle: THREE.MathUtils.degToRad(70),
-  minAzimuthAngle: THREE.MathUtils.degToRad(-30),
-  maxAzimuthAngle: THREE.MathUtils.degToRad(30),
+  maxPolarAngle: DEBUG_UNLOCK_CONTROLS
+    ? Math.PI
+    : THREE.MathUtils.degToRad(60),
+  minAzimuthAngle: DEBUG_UNLOCK_CONTROLS
+    ? -Infinity
+    : THREE.MathUtils.degToRad(-15),
+  maxAzimuthAngle: DEBUG_UNLOCK_CONTROLS
+    ? Infinity
+    : THREE.MathUtils.degToRad(15),
   dampingFactor: 0.08,
+  enablePan: DEBUG_UNLOCK_CONTROLS,
 }
 
 // Offset orbit target relative to letter_level.
-const TARGET_OFFSET: [number, number, number] = [0.0, 0, -0.1]
+const TARGET_OFFSET: [number, number, number] = [0.0, 0, 0]
 const INITIAL_AZIMUTH = 0
 const INITIAL_POLAR = 0.0001
 const INITIAL_DISTANCE = 1.2
@@ -109,7 +119,7 @@ export default function SceneCamera({
       ref={controlsRef}
       makeDefault
       enableDamping
-      enablePan={false}
+      enablePan={CAMERA_SETTINGS.enablePan}
       dampingFactor={CAMERA_SETTINGS.dampingFactor}
       minDistance={CAMERA_SETTINGS.minDistance}
       maxDistance={CAMERA_SETTINGS.maxDistance}

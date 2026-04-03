@@ -1,30 +1,56 @@
 "use client"
 
-import {
-  Borel,
-  Cherry_Bomb_One,
-  Dancing_Script,
-  Josefin_Sans,
-  Lobster,
-} from "next/font/google"
+import localFont from "next/font/local"
 import { useEffect, useMemo, useRef, useState } from "react"
 
 import {
+  MIN_LASER_CUT_LINE_DISTANCE_MM,
+  THICKNESS_OPTIONS_MM,
   sanitizeNameInput,
   toTitleCase,
   type FontOption,
+  type LaserSafetyResult,
+  type TextHeartContainmentResult,
   type MaterialKey,
+  type TextMaterialKey,
 } from "./helpers"
 
-const borel = Borel({ weight: "400", subsets: ["latin"] })
-const cherryBombOne = Cherry_Bomb_One({ weight: "400", subsets: ["latin"] })
-const dancingScript = Dancing_Script({ weight: "400", subsets: ["latin"] })
-const josefinSans = Josefin_Sans({ weight: "400", subsets: ["latin"] })
-const lobster = Lobster({ weight: "400", subsets: ["latin"] })
+const borel = localFont({
+  src: "../../public/fonts/Borel-Regular.ttf",
+  variable: "--font-borel",
+  display: "swap",
+})
+const cherryBombOne = localFont({
+  src: "../../public/fonts/CherryBombOne-Regular.ttf",
+  variable: "--font-cherry",
+  display: "swap",
+})
+const dancingScript = localFont({
+  src: "../../public/fonts/DancingScript-VariableFont_wght.ttf",
+  variable: "--font-dancing",
+  display: "swap",
+})
+const josefinSans = localFont({
+  src: "../../public/fonts/JosefinSans-VariableFont_wght.ttf",
+  variable: "--font-josefin",
+  display: "swap",
+})
+const lobster = localFont({
+  src: "../../public/fonts/Lobster-Regular.ttf",
+  variable: "--font-lobster",
+  display: "swap",
+})
+const geistMono = localFont({
+  src: "../../public/fonts/GeistMono-VariableFont_wght.ttf",
+  variable: "--font-geist-mono",
+  display: "swap",
+})
 
 type ConfiguratorPanelProps = {
   nameValue: string
   onNameChange: (value: string) => void
+  includeHeart: boolean
+  onIncludeHeartChange: (value: boolean) => void
   fontOptions: FontOption[]
   selectedFontFile: string
   onSelectFont: (file: string) => void
@@ -33,22 +59,52 @@ type ConfiguratorPanelProps = {
   maxWidthCm: number
   onWidthChange: (value: number) => void
   heightCm: number
-  minHeightCm: number
-  maxHeightCm: number
-  onHeightChange: (value: number) => void
+  heartWidthCm: number
+  minHeartWidthCm: number
+  maxHeartWidthCm: number
+  onHeartWidthChange: (value: number) => void
+  heartHeightCm: number
+  minHeartHeightCm: number
+  maxHeartHeightCm: number
+  onHeartHeightChange: (value: number) => void
+  heartVariants: string[]
+  selectedHeartVariant: string
+  onSelectHeartVariant: (value: string) => void
   materialOptions: Array<{
     key: MaterialKey
     label: string
     available: boolean
   }>
-  selectedMaterial: MaterialKey
-  onMaterialChange: (value: MaterialKey) => void
+  heartMaterialOptions: Array<{
+    key: MaterialKey
+    label: string
+    available: boolean
+  }>
+  textMaterialOptions: Array<{
+    key: TextMaterialKey
+    label: string
+    available: boolean
+  }>
+  textMaterial: TextMaterialKey
+  onTextMaterialChange: (value: TextMaterialKey) => void
+  heartMaterial: MaterialKey
+  onHeartMaterialChange: (value: MaterialKey) => void
   thicknessOptions: number[]
-  thicknessMm: number
-  onThicknessChange: (value: number) => void
+  textThicknessMm: (typeof THICKNESS_OPTIONS_MM)[number]
+  onTextThicknessChange: (value: (typeof THICKNESS_OPTIONS_MM)[number]) => void
+  heartThicknessMm: (typeof THICKNESS_OPTIONS_MM)[number]
+  onHeartThicknessChange: (value: (typeof THICKNESS_OPTIONS_MM)[number]) => void
   spacing: number
   onSpacingChange: (value: number) => void
-  stockInfoText: string | null
+  textOffsetYcm: number
+  onTextOffsetYChange: (value: number) => void
+  engravingMode: boolean
+  laserSafety: LaserSafetyResult | null
+  textFitResult: {
+    result: TextHeartContainmentResult
+  } | null
+  canRunLaserTest: boolean
+  onRunLaserTest: () => void
 }
 
 function getFontPreviewClass(fontLabel: string) {
@@ -59,6 +115,9 @@ function getFontPreviewClass(fontLabel: string) {
   if (normalized.includes("dancing script")) return dancingScript.className
   if (normalized.includes("josefin sans")) return josefinSans.className
   if (normalized.includes("lobster")) return lobster.className
+  if (normalized.includes("geist") || normalized.includes("mono")) {
+    return geistMono.className
+  }
 
   return ""
 }
@@ -66,6 +125,8 @@ function getFontPreviewClass(fontLabel: string) {
 export default function ConfiguratorPanel({
   nameValue,
   onNameChange,
+  includeHeart,
+  onIncludeHeartChange,
   fontOptions,
   selectedFontFile,
   onSelectFont,
@@ -74,18 +135,38 @@ export default function ConfiguratorPanel({
   maxWidthCm,
   onWidthChange,
   heightCm,
-  minHeightCm,
-  maxHeightCm,
-  onHeightChange,
+  heartWidthCm,
+  minHeartWidthCm,
+  maxHeartWidthCm,
+  onHeartWidthChange,
+  heartHeightCm,
+  minHeartHeightCm,
+  maxHeartHeightCm,
+  onHeartHeightChange,
+  heartVariants,
+  selectedHeartVariant,
+  onSelectHeartVariant,
   materialOptions,
-  selectedMaterial,
-  onMaterialChange,
+  heartMaterialOptions,
+  textMaterialOptions,
+  textMaterial,
+  onTextMaterialChange,
+  heartMaterial,
+  onHeartMaterialChange,
   thicknessOptions,
-  thicknessMm,
-  onThicknessChange,
+  textThicknessMm,
+  onTextThicknessChange,
+  heartThicknessMm,
+  onHeartThicknessChange,
   spacing,
   onSpacingChange,
-  stockInfoText,
+  textOffsetYcm,
+  onTextOffsetYChange,
+  engravingMode,
+  laserSafety,
+  textFitResult,
+  canRunLaserTest,
+  onRunLaserTest,
 }: ConfiguratorPanelProps) {
   const [fontMenuOpen, setFontMenuOpen] = useState(false)
   const fontMenuRef = useRef<HTMLDivElement | null>(null)
@@ -108,8 +189,11 @@ export default function ConfiguratorPanel({
   }, [])
 
   return (
-    <div className="absolute right-14 top-1/2 z-20 w-[clamp(17rem,28vw,22rem)] max-w-[calc(100%-2.5rem)] -translate-y-1/2">
-      <div className="flex max-h-[calc(100%-1.5rem)] flex-col gap-4 overflow-y-auto rounded-xl bg-stone-950/20 p-4 text-amber-50 backdrop-blur-sm">
+    <div className="absolute right-10 top-8 z-20 flex max-h-[calc(100%-4rem)] w-[clamp(17rem,28vw,22rem)] max-w-[calc(100%-2.5rem)] flex-col gap-4 overflow-y-auto">
+      <section className="rounded-xl bg-stone-950/20 p-4 text-amber-50 backdrop-blur-sm">
+        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-amber-100/80">
+          Text
+        </h3>
         <label className="flex flex-col gap-1 text-sm">
           Name
           <div className="relative">
@@ -177,7 +261,7 @@ export default function ConfiguratorPanel({
         </div>
 
         <label className="flex flex-col gap-1 text-sm">
-          Breite ({widthCm.toFixed(1)} cm)
+          Text Groesse ({widthCm.toFixed(1)} x {heightCm.toFixed(1)} cm)
           <div className="flex items-center gap-2">
             <input
               type="range"
@@ -205,44 +289,240 @@ export default function ConfiguratorPanel({
         </label>
 
         <label className="flex flex-col gap-1 text-sm">
-          {"H\u00f6he"} ({heightCm.toFixed(1)} cm)
+          Spacing {spacing.toFixed(3)}
+          <input
+            type="range"
+            min="-0.2"
+            max="0.3"
+            step="0.005"
+            value={spacing}
+            onChange={(e) => onSpacingChange(Number(e.target.value))}
+          />
+        </label>
+
+        <label className="mt-3 flex flex-col gap-1 text-sm">
+          Text Position Y ( {textOffsetYcm.toFixed(1)} cm )
           <div className="flex items-center gap-2">
             <input
               type="range"
-              min={minHeightCm}
-              max={maxHeightCm}
-              step="0.1"
-              value={heightCm}
-              onChange={(e) => onHeightChange(Number(e.target.value))}
+              min={-10}
+              max={10}
+              step={0.1}
+              value={textOffsetYcm}
+              onChange={(e) => onTextOffsetYChange(Number(e.target.value))}
               className="w-full"
             />
             <input
               type="number"
-              min={Number(minHeightCm.toFixed(1))}
-              max={Number(maxHeightCm.toFixed(1))}
+              min={-10}
+              max={10}
               step={0.1}
-              value={Number(heightCm.toFixed(1))}
+              value={Number(textOffsetYcm.toFixed(1))}
               onChange={(e) => {
                 const next = Number(e.target.value)
                 if (Number.isNaN(next)) return
-                onHeightChange(next)
+                onTextOffsetYChange(next)
               }}
               className="w-16 rounded border border-white/35 bg-white/85 px-2 py-1 text-xs text-stone-900"
             />
           </div>
         </label>
 
-        <div className="flex flex-col gap-1 text-sm">
-          Material
+        <div className="mt-3 flex flex-col gap-1 text-sm">
+          Material (Text)
           <div className="flex flex-wrap gap-2">
-            {materialOptions.map((option) => {
-              const active = selectedMaterial === option.key
+            {textMaterialOptions.map((option) => {
+              const active = textMaterial === option.key
+              const engravingLocked = option.key === "engraving" && !includeHeart
               return (
                 <button
                   key={option.key}
                   type="button"
-                  onClick={() => onMaterialChange(option.key)}
-                  disabled={!option.available}
+                  onClick={() => onTextMaterialChange(option.key)}
+                  disabled={!option.available || engravingLocked}
+                  className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs ${
+                    active
+                      ? "border-amber-200 bg-amber-100/25 text-amber-100"
+                    : option.available
+                        ? "border-white/35 bg-white/15 text-amber-50"
+                        : "cursor-not-allowed border-white/20 bg-white/10 text-amber-50/50"
+                  }`}
+                >
+                  <span
+                    className={`h-2.5 w-2.5 rounded-full ${
+                      active
+                        ? "bg-amber-200"
+                        : option.available
+                          ? "bg-transparent ring-1 ring-amber-100"
+                          : "bg-transparent ring-1 ring-amber-100/40"
+                    }`}
+                  />
+                  {option.label}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
+        <div className={`mt-3 flex flex-col gap-1 text-sm ${engravingMode ? "opacity-60" : ""}`}>
+          Dicke (Text) ({textThicknessMm} mm)
+          <div className="flex flex-wrap gap-2">
+            {thicknessOptions.map((option) => {
+              const active = textThicknessMm === option
+              return (
+                <button
+                  key={`text-${option}`}
+                  type="button"
+                  onClick={() =>
+                    onTextThicknessChange(
+                      option as (typeof THICKNESS_OPTIONS_MM)[number]
+                    )
+                  }
+                  disabled={engravingMode}
+                  className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs ${
+                    active
+                      ? "border-amber-200 bg-amber-100/25 text-amber-100"
+                      : "border-white/35 bg-white/15 text-amber-50"
+                  }`}
+                >
+                  <span
+                    className={`h-2.5 w-2.5 rounded-full ${
+                      active
+                        ? "bg-amber-200"
+                        : "bg-transparent ring-1 ring-amber-100"
+                    }`}
+                  />
+                  {option} mm
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+
+      <section className="rounded-xl bg-stone-950/20 p-4 text-amber-50 backdrop-blur-sm">
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <h3 className="text-sm font-semibold uppercase tracking-wide text-amber-100/80">
+            Herz
+          </h3>
+          <label className="flex items-center gap-3 text-xs font-semibold text-amber-100/90">
+            Herz aktiv
+            <span className="relative inline-flex h-6 w-11 items-center">
+              <input
+                type="checkbox"
+                checked={includeHeart}
+                onChange={(e) => onIncludeHeartChange(e.target.checked)}
+                className="peer sr-only"
+              />
+              <span className="absolute inset-0 rounded-full border border-white/30 bg-white/10 transition peer-checked:border-amber-200/80 peer-checked:bg-amber-200/50" />
+              <span className="absolute left-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform duration-200 peer-checked:translate-x-5" />
+            </span>
+          </label>
+        </div>
+
+        <div className={includeHeart ? "" : "opacity-60"}>
+          <div className="mb-3">
+            <div className="mb-2 text-xs uppercase tracking-wide text-amber-100/80">
+              Herz Varianten
+            </div>
+            <div className="grid grid-cols-4 gap-2">
+              {heartVariants.map((variant) => {
+                const active = selectedHeartVariant === variant
+                return (
+                  <button
+                    key={variant}
+                    type="button"
+                    onClick={() => onSelectHeartVariant(variant)}
+                    disabled={!includeHeart}
+                    className={`flex h-12 items-center justify-center rounded border ${
+                      active
+                        ? "border-amber-200 bg-amber-100/20"
+                        : "border-white/20 bg-white/10 hover:bg-white/15"
+                    }`}
+                  >
+                    <img
+                      src={variant}
+                      alt="Herzvariante"
+                      className="h-9 w-9 object-contain"
+                    />
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          <label className="flex flex-col gap-1 text-sm">
+            Herz Breite ({heartWidthCm.toFixed(1)} cm)
+            <div className="flex items-center gap-2">
+              <input
+                type="range"
+                min={minHeartWidthCm}
+                max={maxHeartWidthCm}
+                step="0.1"
+                value={heartWidthCm}
+                onChange={(e) => onHeartWidthChange(Number(e.target.value))}
+                className="w-full"
+                disabled={!includeHeart}
+              />
+              <input
+                type="number"
+                min={minHeartWidthCm}
+                max={maxHeartWidthCm}
+                step={0.1}
+                value={Number(heartWidthCm.toFixed(1))}
+                onChange={(e) => {
+                  const next = Number(e.target.value)
+                  if (Number.isNaN(next)) return
+                  onHeartWidthChange(next)
+                }}
+                className="w-16 rounded border border-white/35 bg-white/85 px-2 py-1 text-xs text-stone-900"
+                disabled={!includeHeart}
+              />
+            </div>
+          </label>
+
+          <label className="mt-3 flex flex-col gap-1 text-sm">
+            Herz Hoehe ({heartHeightCm.toFixed(1)} cm)
+            <div className="flex items-center gap-2">
+              <input
+                type="range"
+                min={minHeartHeightCm}
+                max={maxHeartHeightCm}
+                step="0.1"
+                value={heartHeightCm}
+                onChange={(e) => onHeartHeightChange(Number(e.target.value))}
+                className="w-full"
+                disabled={!includeHeart}
+              />
+              <input
+                type="number"
+                min={minHeartHeightCm}
+                max={maxHeartHeightCm}
+                step={0.1}
+                value={Number(heartHeightCm.toFixed(1))}
+                onChange={(e) => {
+                  const next = Number(e.target.value)
+                  if (Number.isNaN(next)) return
+                  onHeartHeightChange(next)
+                }}
+                className="w-16 rounded border border-white/35 bg-white/85 px-2 py-1 text-xs text-stone-900"
+                disabled={!includeHeart}
+              />
+            </div>
+          </label>
+        </div>
+
+        <div className={`mt-3 flex flex-col gap-1 text-sm ${includeHeart ? "" : "opacity-60"}`}>
+          Material (Herz)
+          <div className="flex flex-wrap gap-2">
+            {heartMaterialOptions.map((option) => {
+              const active = heartMaterial === option.key
+              return (
+                <button
+                  key={`heart-${option.key}`}
+                  type="button"
+                  onClick={() => onHeartMaterialChange(option.key)}
+                  disabled={!option.available || !includeHeart}
                   className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs ${
                     active
                       ? "border-amber-200 bg-amber-100/25 text-amber-100"
@@ -267,16 +547,21 @@ export default function ConfiguratorPanel({
           </div>
         </div>
 
-        <div className="flex flex-col gap-1 text-sm">
-          Dicke ({thicknessMm} mm)
+        <div className={`mt-3 flex flex-col gap-1 text-sm ${includeHeart ? "" : "opacity-60"}`}>
+          Dicke (Herz) ({heartThicknessMm} mm)
           <div className="flex flex-wrap gap-2">
             {thicknessOptions.map((option) => {
-              const active = thicknessMm === option
+              const active = heartThicknessMm === option
               return (
                 <button
-                  key={option}
+                  key={`heart-thickness-${option}`}
                   type="button"
-                  onClick={() => onThicknessChange(option)}
+                  onClick={() =>
+                    onHeartThicknessChange(
+                      option as (typeof THICKNESS_OPTIONS_MM)[number]
+                    )
+                  }
+                  disabled={!includeHeart}
                   className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs ${
                     active
                       ? "border-amber-200 bg-amber-100/25 text-amber-100"
@@ -296,21 +581,45 @@ export default function ConfiguratorPanel({
             })}
           </div>
         </div>
+      </section>
 
-        {stockInfoText && <p className="text-xs text-amber-100/90">{stockInfoText}</p>}
+      <section className="rounded-xl bg-stone-950/20 p-4 text-amber-50 backdrop-blur-sm">
+        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-amber-100/80">
+          Laser
+        </h3>
+        <button
+          type="button"
+          onClick={onRunLaserTest}
+          disabled={!canRunLaserTest}
+          className="mt-3 rounded border border-white/35 bg-white/15 px-3 py-2 text-xs text-amber-50 hover:bg-white/25 disabled:cursor-not-allowed disabled:border-white/20 disabled:bg-white/10 disabled:text-amber-50/50"
+        >
+          Lasertest ausfuehren
+        </button>
 
-        <label className="flex flex-col gap-1 text-sm">
-          Spacing {spacing.toFixed(3)}
-          <input
-            type="range"
-            min="0"
-            max="0.1"
-            step="0.005"
-            value={spacing}
-            onChange={(e) => onSpacingChange(Number(e.target.value))}
-          />
-        </label>
-      </div>
+        {laserSafety && (
+          <p
+            className={`mt-2 text-xs ${
+              laserSafety.isSafe ? "text-emerald-200" : "text-rose-200"
+            }`}
+          >
+            {laserSafety.isSafe
+              ? `Lasertest bestanden: duennste Stelle ${laserSafety.minimumDistanceMm?.toFixed(1)} mm (>= ${MIN_LASER_CUT_LINE_DISTANCE_MM} mm).`
+              : `Lasertest nicht bestanden: duennste Stelle ${laserSafety.minimumDistanceMm?.toFixed(1)} mm (< ${MIN_LASER_CUT_LINE_DISTANCE_MM} mm).`}
+          </p>
+        )}
+
+        {textFitResult && (
+          <p
+            className={`mt-2 text-xs ${
+              textFitResult.result.isSafe ? "text-emerald-200" : "text-rose-200"
+            }`}
+          >
+            {textFitResult.result.isSafe
+              ? `Text im Herz: Abstand >= ${textFitResult.result.marginMm} mm.`
+              : `Text ausserhalb des Herzens (Sicherheitsabstand ${textFitResult.result.marginMm} mm).`}
+          </p>
+        )}
+      </section>
     </div>
   )
 }

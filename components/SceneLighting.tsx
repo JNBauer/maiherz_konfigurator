@@ -1,12 +1,20 @@
 "use client"
 
-import { Environment } from "@react-three/drei"
-import { useThree } from "@react-three/fiber"
-import { useEffect } from "react"
+import { useFrame, useThree } from "@react-three/fiber"
+import { useEffect, useMemo, useRef } from "react"
 import * as THREE from "three"
 
-export default function SceneLighting() {
-  const { gl } = useThree()
+const DEFAULT_TARGET: [number, number, number] = [0, 0, 0]
+
+type SceneLightingProps = {
+  targetPosition?: [number, number, number] | null
+}
+
+export default function SceneLighting({ targetPosition }: SceneLightingProps) {
+  const { gl, scene } = useThree()
+  const lightRef = useRef<THREE.SpotLight | null>(null)
+  const targetRef = useRef<THREE.Object3D | null>(null)
+  const lightOffset = useRef(new THREE.Vector3(0, 0.65, 0.6))
 
   useEffect(() => {
     const prevToneMapping = gl.toneMapping
@@ -16,10 +24,10 @@ export default function SceneLighting() {
     const prevShadowType = gl.shadowMap.type
 
     gl.toneMapping = THREE.ACESFilmicToneMapping
-    gl.toneMappingExposure = 0.85
+    gl.toneMappingExposure = 0.9
     gl.outputColorSpace = THREE.SRGBColorSpace
     gl.shadowMap.enabled = true
-    gl.shadowMap.type = THREE.PCFSoftShadowMap
+    gl.shadowMap.type = THREE.PCFShadowMap
 
     return () => {
       gl.toneMapping = prevToneMapping
@@ -30,35 +38,86 @@ export default function SceneLighting() {
     }
   }, [gl])
 
+  useEffect(() => {
+    const prevBackground = scene.background
+    scene.background = new THREE.Color("#1a1510")
+    return () => {
+      scene.background = prevBackground
+    }
+  }, [scene])
+
+  useEffect(() => {
+    if (lightRef.current && targetRef.current) {
+      lightRef.current.target = targetRef.current
+    }
+  }, [])
+
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      const step = event.shiftKey ? 0.25 : 0.08
+      switch (event.key) {
+        case "ArrowLeft":
+          lightOffset.current.x -= step
+          break
+        case "ArrowRight":
+          lightOffset.current.x += step
+          break
+        case "ArrowUp":
+          lightOffset.current.z -= step
+          break
+        case "ArrowDown":
+          lightOffset.current.z += step
+          break
+        case "PageUp":
+          lightOffset.current.y += step
+          break
+        case "PageDown":
+          lightOffset.current.y = Math.max(0.1, lightOffset.current.y - step)
+          break
+        case "r":
+        case "R":
+          lightOffset.current.set(0, 0.65, 0.6)
+          break
+        default:
+          return
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [])
+
+  useFrame(() => {
+    const light = lightRef.current
+    const target = targetRef.current
+    if (!light || !target) return
+    const [tx, ty, tz] = targetPosition ?? DEFAULT_TARGET
+    target.position.set(tx, ty, tz)
+    light.position.set(
+      tx + lightOffset.current.x,
+      ty + lightOffset.current.y,
+      tz + lightOffset.current.z
+    )
+    light.target.updateMatrixWorld()
+  })
+
   return (
     <>
-      <Environment preset="warehouse" environmentIntensity={0.45} />
-
-      <ambientLight intensity={0.08} color="#F5EBD8" />
-      <hemisphereLight args={["#FFE7C2", "#6E6254", 0.22]} />
-
-      <directionalLight
-        position={[4.5, 6.5, 5]}
-        intensity={0.62}
-        color="#FFD9A8"
-        castShadow
-        shadow-mapSize-width={3072}
-        shadow-mapSize-height={3072}
-        shadow-bias={-0.00008}
-      />
-
-      <directionalLight
-        position={[-4, 3.5, -3]}
-        intensity={0.2}
-        color="#BFD3FF"
-      />
-
+      <ambientLight intensity={0.08} color="#2b221b" />
+      <object3D ref={targetRef} />
       <spotLight
-        position={[0, 5, 0]}
-        angle={0.5}
-        penumbra={0.6}
-        intensity={0.12}
-        color="#FFE3B8"
+        ref={lightRef}
+        intensity={3.2}
+        color="#ffe4c4"
+        angle={0.8}
+        penumbra={0.8}
+        decay={1.8}
+        distance={20}
+        castShadow
+        shadow-mapSize-width={2048}
+        shadow-mapSize-height={2048}
+        shadow-bias={-0.00005}
+        shadow-normalBias={0.02}
       />
     </>
   )
