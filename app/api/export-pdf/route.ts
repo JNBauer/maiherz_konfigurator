@@ -291,7 +291,7 @@ export async function POST(req: Request) {
 
   const pdfBuffer = await pdfDoc.save()
 
-  return new NextResponse(pdfBuffer, {
+  return new NextResponse(Buffer.from(pdfBuffer), {
     headers: {
       "Content-Type": "application/pdf",
       "Content-Disposition": 'attachment; filename="maiherz-blueprint.pdf"',
