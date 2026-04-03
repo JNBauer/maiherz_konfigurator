@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@eslint/js": "^9.39.4",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.5.0",
     "@xmldom/xmldom": "^0.9.9",
@@ -23,7 +24,6 @@
     "three-stdlib": "^2.36.1"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
