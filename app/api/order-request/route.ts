@@ -98,7 +98,7 @@ export async function POST(request: Request) {
 
     await transporter.sendMail({
       from,
-      to: "jnba@uni-bonn.de",
+      to: "julian.bauer28@gmail.com",
       subject: "Neue Auftragsanfrage",
       text: summary,
       attachments: [

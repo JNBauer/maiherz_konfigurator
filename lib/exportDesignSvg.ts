@@ -22,6 +22,24 @@ type ExportInput = {
 
 type Polyline = Array<[number, number]>
 
+type DesignPolylines = {
+  heartPolylines: Polyline[]
+  textPolylines: Polyline[]
+  bounds: { minX: number; minY: number; maxX: number; maxY: number }
+}
+
+async function ensureDomParser() {
+  if (typeof globalThis.DOMParser !== "undefined") return
+  try {
+    const mod = await import("@xmldom/xmldom")
+    globalThis.DOMParser = mod.DOMParser as unknown as typeof DOMParser
+  } catch (error) {
+    throw new Error(
+      "DOMParser is not available. Install @xmldom/xmldom to enable SVG parsing."
+    )
+  }
+}
+
 function ensureClosedShape(shape: THREE.Shape) {
   const first = shape.getPoint(0)
   const last = shape.getPoint(1)
@@ -74,7 +92,11 @@ function collectBounds(polylines: Polyline[]) {
   return { minX, minY, maxX, maxY }
 }
 
-export async function exportDesignSvg(input: ExportInput) {
+export async function getDesignPolylines(
+  input: ExportInput,
+  paddingMm = 2
+): Promise<DesignPolylines> {
+  await ensureDomParser()
   const textPolylines: Polyline[] = []
   const heartPolylines: Polyline[] = []
 
@@ -118,7 +140,7 @@ export async function exportDesignSvg(input: ExportInput) {
 
     for (let i = 0; i < heartPolylines.length; i++) {
       heartPolylines[i] = heartPolylines[i].map(([x, y]) => {
-        const nx = (x - heartCenterX) * scaleX
+        const nx = (heartCenterX - x) * scaleX
         const ny = (y - heartCenterY) * scaleY
         return [nx, ny] as [number, number]
       })
@@ -170,11 +192,26 @@ export async function exportDesignSvg(input: ExportInput) {
 
   const allPolylines = [...heartPolylines, ...textPolylines]
   const bounds = collectBounds(allPolylines)
-  const padding = 2
-  const minX = bounds.minX - padding
-  const minY = bounds.minY - padding
-  const maxX = bounds.maxX + padding
-  const maxY = bounds.maxY + padding
+  const minX = bounds.minX - paddingMm
+  const minY = bounds.minY - paddingMm
+  const maxX = bounds.maxX + paddingMm
+  const maxY = bounds.maxY + paddingMm
+
+  return {
+    heartPolylines,
+    textPolylines,
+    bounds: { minX, minY, maxX, maxY },
+  }
+}
+
+export async function exportDesignSvg(input: ExportInput) {
+  const { heartPolylines, textPolylines, bounds } =
+    await getDesignPolylines(input, 2)
+
+  const minX = bounds.minX
+  const minY = bounds.minY
+  const maxX = bounds.maxX
+  const maxY = bounds.maxY
   const width = Math.max(maxX - minX, 1)
   const height = Math.max(maxY - minY, 1)
 

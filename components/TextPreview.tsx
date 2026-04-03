@@ -85,6 +85,12 @@ export default function TextPreview() {
     "idle" | "sending" | "success" | "error"
   >("idle")
   const [requestError, setRequestError] = useState<string | null>(null)
+  const [printPaperSize, setPrintPaperSize] = useState<"A4" | "A3">("A4")
+  const [printOverlapMm, setPrintOverlapMm] = useState(10)
+  const [printStatus, setPrintStatus] = useState<
+    "idle" | "loading" | "error"
+  >("idle")
+  const [printError, setPrintError] = useState<string | null>(null)
   const [laserSafetyCheck, setLaserSafetyCheck] = useState<{
     key: string
     result: LaserSafetyResult
@@ -332,6 +338,54 @@ export default function TextPreview() {
         error instanceof Error ? error.message : "Senden fehlgeschlagen."
       setRequestStatus("error")
       setRequestError(message)
+    }
+  }
+
+  async function handleDownloadPdf() {
+    setPrintStatus("loading")
+    setPrintError(null)
+
+    try {
+      const res = await fetch("/api/export-pdf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          includeHeart,
+          heartVariant,
+          heartWidthCm,
+          heartHeightCm,
+          text: nameValue,
+          textWidthCm: widthCm,
+          textHeightCm: heightCm,
+          textOffsetYcm,
+          textMaterial,
+          spacing,
+          selectedFontFile,
+          paperSize: printPaperSize,
+          overlapMm: printOverlapMm,
+        }),
+      })
+
+      if (!res.ok) {
+        const data = (await res.json()) as { error?: string }
+        throw new Error(data.error ?? "PDF-Export fehlgeschlagen.")
+      }
+
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement("a")
+      link.href = url
+      link.download = "maiherz-blueprint.pdf"
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      URL.revokeObjectURL(url)
+      setPrintStatus("idle")
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "PDF-Export fehlgeschlagen."
+      setPrintStatus("error")
+      setPrintError(message)
     }
   }
 
@@ -712,79 +766,136 @@ fov:     ${cameraDebug.fov}`}
         </section>
 
         <section className="mx-auto mt-4 w-[90%] pb-6 md:mt-5 md:pb-8">
-          <article className="rounded-xl border border-stone-300 bg-white p-4 md:p-5">
-            <h3 className="text-lg font-semibold text-stone-800">Kontakt</h3>
-            <form className="mt-4 grid gap-3">
-              <label className="grid gap-1 text-sm text-stone-700">
-                Vollstaendiger Name
-                <input
-                  type="text"
-                  placeholder="Max Mustermann"
-                  className="rounded border border-stone-300 px-3 py-2"
-                  value={contactName}
-                  onChange={(e) => setContactName(e.target.value)}
-                />
-              </label>
-              <label className="grid gap-1 text-sm text-stone-700">
-                E-Mail
-                <input
-                  type="email"
-                  placeholder="name@beispiel.de"
-                  className="rounded border border-stone-300 px-3 py-2"
-                  value={contactEmail}
-                  onChange={(e) => setContactEmail(e.target.value)}
-                />
-              </label>
-              <label className="grid gap-1 text-sm text-stone-700">
-                Telefonnummer (optional)
-                <input
-                  type="tel"
-                  placeholder="+49 ..."
-                  className="rounded border border-stone-300 px-3 py-2"
-                  value={contactPhone}
-                  onChange={(e) => setContactPhone(e.target.value)}
-                />
-              </label>
-              <label className="grid gap-1 text-sm text-stone-700">
-                Nachricht
-                <textarea
-                  rows={3}
-                  placeholder="Hinweise zum Design oder Wunschlieferzeit"
-                  className="rounded border border-stone-300 px-3 py-2"
-                  value={contactMessage}
-                  onChange={(e) => setContactMessage(e.target.value)}
-                />
-              </label>
-              <p className="text-xs leading-5 text-stone-600">
-                Mit dem Absenden des Formulars erklaeren Sie sich damit
-                einverstanden, dass Ihre Angaben zur Bearbeitung Ihrer Anfrage
-                verarbeitet werden. Weitere Informationen finden Sie in unserer
-                Datenschutzerklaerung.
-              </p>
-              <p className="text-xs leading-5 text-stone-600">
-                Die ueber den Konfigurator uebermittelten Anfragen stellen kein
-                verbindliches Angebot dar.
-              </p>
-              <button
-                type="button"
-                onClick={handleSendRequest}
-                disabled={requestStatus === "sending"}
-                className="mt-2 rounded bg-stone-900 px-4 py-2 text-sm font-medium text-white hover:bg-stone-800 disabled:cursor-not-allowed disabled:bg-stone-500"
-              >
-                {requestStatus === "sending"
-                  ? "Wird gesendet..."
-                  : "Auftragsanfrage abschicken"}
-              </button>
-              {requestStatus === "success" && (
-                <p className="text-sm text-emerald-700">
-                  Anfrage wurde gesendet. Danke!
+          <div className="grid gap-4 md:grid-cols-2">
+            <article className="rounded-xl border border-stone-300 bg-white p-4 md:p-5">
+              <h3 className="text-lg font-semibold text-stone-800">
+                Download &amp; Print
+              </h3>
+              <div className="mt-4 grid gap-3">
+                <label className="grid gap-1 text-sm text-stone-700">
+                  Papierformat
+                  <select
+                    className="rounded border border-stone-300 px-3 py-2"
+                    value={printPaperSize}
+                    onChange={(e) =>
+                      setPrintPaperSize(e.target.value as "A4" | "A3")
+                    }
+                  >
+                    <option value="A4">A4 (Standard)</option>
+                    <option value="A3">A3</option>
+                  </select>
+                </label>
+                <label className="grid gap-1 text-sm text-stone-700">
+                  Ueberlappung zum Zusammenkleben (mm)
+                  <input
+                    type="number"
+                    min={0}
+                    max={30}
+                    step={1}
+                    className="rounded border border-stone-300 px-3 py-2"
+                    value={Number(printOverlapMm.toFixed(0))}
+                    onChange={(e) => {
+                      const next = Number(e.target.value)
+                      if (Number.isNaN(next)) return
+                      setPrintOverlapMm(Math.max(0, Math.min(30, next)))
+                    }}
+                  />
+                </label>
+                <p className="text-xs leading-5 text-stone-600">
+                  Das PDF ist massstabgetreu. Grosse Designs werden automatisch
+                  auf mehrere Seiten verteilt und mit Ueberlappungen markiert,
+                  damit Sie sie einfach zusammenkleben koennen.
                 </p>
-              )}
-              {requestStatus === "error" && requestError && (
-                <p className="text-sm text-rose-700">{requestError}</p>
-              )}
-            </form>
-          </article>
+                <button
+                  type="button"
+                  onClick={handleDownloadPdf}
+                  disabled={printStatus === "loading"}
+                  className="mt-2 rounded border border-stone-300 bg-white px-4 py-2 text-sm font-medium text-stone-900 hover:bg-stone-50 disabled:cursor-not-allowed disabled:bg-stone-100"
+                >
+                  {printStatus === "loading"
+                    ? "PDF wird erstellt..."
+                    : "PDF herunterladen"}
+                </button>
+                {printStatus === "error" && printError && (
+                  <p className="text-sm text-rose-700">{printError}</p>
+                )}
+              </div>
+            </article>
+
+            <article className="rounded-xl border border-stone-300 bg-white p-4 md:p-5">
+              <h3 className="text-lg font-semibold text-stone-800">Kontakt</h3>
+              <form className="mt-4 grid gap-3">
+                <label className="grid gap-1 text-sm text-stone-700">
+                  Vollstaendiger Name
+                  <input
+                    type="text"
+                    placeholder="Max Mustermann"
+                    className="rounded border border-stone-300 px-3 py-2"
+                    value={contactName}
+                    onChange={(e) => setContactName(e.target.value)}
+                  />
+                </label>
+                <label className="grid gap-1 text-sm text-stone-700">
+                  E-Mail
+                  <input
+                    type="email"
+                    placeholder="name@beispiel.de"
+                    className="rounded border border-stone-300 px-3 py-2"
+                    value={contactEmail}
+                    onChange={(e) => setContactEmail(e.target.value)}
+                  />
+                </label>
+                <label className="grid gap-1 text-sm text-stone-700">
+                  Telefonnummer (optional)
+                  <input
+                    type="tel"
+                    placeholder="+49 ..."
+                    className="rounded border border-stone-300 px-3 py-2"
+                    value={contactPhone}
+                    onChange={(e) => setContactPhone(e.target.value)}
+                  />
+                </label>
+                <label className="grid gap-1 text-sm text-stone-700">
+                  Nachricht
+                  <textarea
+                    rows={3}
+                    placeholder="Hinweise zum Design oder Wunschlieferzeit"
+                    className="rounded border border-stone-300 px-3 py-2"
+                    value={contactMessage}
+                    onChange={(e) => setContactMessage(e.target.value)}
+                  />
+                </label>
+                <p className="text-xs leading-5 text-stone-600">
+                  Mit dem Absenden des Formulars erklaeren Sie sich damit
+                  einverstanden, dass Ihre Angaben zur Bearbeitung Ihrer Anfrage
+                  verarbeitet werden. Weitere Informationen finden Sie in unserer
+                  Datenschutzerklaerung.
+                </p>
+                <p className="text-xs leading-5 text-stone-600">
+                  Die ueber den Konfigurator uebermittelten Anfragen stellen kein
+                  verbindliches Angebot dar.
+                </p>
+                <button
+                  type="button"
+                  onClick={handleSendRequest}
+                  disabled={requestStatus === "sending"}
+                  className="mt-2 rounded bg-stone-900 px-4 py-2 text-sm font-medium text-white hover:bg-stone-800 disabled:cursor-not-allowed disabled:bg-stone-500"
+                >
+                  {requestStatus === "sending"
+                    ? "Wird gesendet..."
+                    : "Auftragsanfrage abschicken"}
+                </button>
+                {requestStatus === "success" && (
+                  <p className="text-sm text-emerald-700">
+                    Anfrage wurde gesendet. Danke!
+                  </p>
+                )}
+                {requestStatus === "error" && requestError && (
+                  <p className="text-sm text-rose-700">{requestError}</p>
+                )}
+              </form>
+            </article>
+          </div>
         </section>
 
       </main>
