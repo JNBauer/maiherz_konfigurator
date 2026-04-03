@@ -18,16 +18,18 @@ const DEBUG_UNLOCK_CONTROLS = false
 const CAMERA_SETTINGS = {
   minDistance: DEBUG_UNLOCK_CONTROLS ? 0.05 : 0.5,
   maxDistance: DEBUG_UNLOCK_CONTROLS ? 100 : 1.0,
-  minPolarAngle: 0,
+  minPolarAngle: DEBUG_UNLOCK_CONTROLS
+    ? 0
+    : THREE.MathUtils.degToRad(-10),
   maxPolarAngle: DEBUG_UNLOCK_CONTROLS
     ? Math.PI
-    : THREE.MathUtils.degToRad(60),
+    : THREE.MathUtils.degToRad(40),
   minAzimuthAngle: DEBUG_UNLOCK_CONTROLS
     ? -Infinity
-    : THREE.MathUtils.degToRad(-15),
+    : THREE.MathUtils.degToRad(-8),
   maxAzimuthAngle: DEBUG_UNLOCK_CONTROLS
     ? Infinity
-    : THREE.MathUtils.degToRad(15),
+    : THREE.MathUtils.degToRad(8),
   dampingFactor: 0.08,
   enablePan: DEBUG_UNLOCK_CONTROLS,
 }

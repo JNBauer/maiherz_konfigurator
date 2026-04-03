@@ -1,26 +1,101 @@
 export default function PrivacyPolicyPage() {
   return (
     <section className="mx-auto w-[90%] max-w-4xl py-10">
-      <h1 className="text-3xl font-semibold text-stone-900">Privacy Policy</h1>
+      <h1 className="text-3xl font-semibold text-stone-900">
+        Datenschutzerklärung
+      </h1>
+
       <div className="mt-6 space-y-4 text-sm leading-6 text-stone-700">
         <p>
-          This is placeholder content for the Privacy Policy page. Replace this
-          text with your final privacy disclosures.
+          Diese Datenschutzerklärung informiert Sie über die Art, den Umfang und
+          Zweck der Verarbeitung von personenbezogenen Daten auf dieser Website.
+        </p>
+
+        <h2 className="font-semibold text-base mt-6">
+          1. Verantwortlicher
+        </h2>
+        <p>
+          Julian Bauer<br />
+          [Aggerstraße 2]<br />
+          [53859 Niederkassel]<br />
+          Deutschland<br />
+          E-Mail: deine-email@example.com
+        </p>
+
+        <h2 className="font-semibold text-base mt-6">
+          2. Hosting
+        </h2>
+        <p>
+          Diese Website wird bei Vercel Inc., 340 S Lemon Ave #4133, Walnut,
+          CA 91789, USA gehostet. Beim Aufruf der Website werden durch den
+          Hosting-Anbieter automatisch Informationen erfasst (z. B. IP-Adresse,
+          Datum und Uhrzeit der Anfrage, Browserinformationen).
         </p>
         <p>
-          Section 1: Data controller and contact. Lorem ipsum dolor sit amet,
-          consectetur adipiscing elit. Quis nostrud exercitation ullamco laboris.
+          Die Verarbeitung erfolgt zur Sicherstellung des Betriebs und der
+          Sicherheit der Website gemäß Art. 6 Abs. 1 lit. f DSGVO.
         </p>
         <p>
-          Section 2: Data processing purposes. Lorem ipsum dolor sit amet,
-          consectetur adipiscing elit. Nisi ut aliquip ex ea commodo consequat.
+          Es kann nicht ausgeschlossen werden, dass Daten in die USA übertragen
+          werden. Vercel verwendet hierfür Standardvertragsklauseln (SCCs) gemäß
+          Art. 46 DSGVO.
+        </p>
+
+        <h2 className="font-semibold text-base mt-6">
+          3. Kontaktaufnahme
+        </h2>
+        <p>
+          Wenn Sie mich per Formular oder E-Mail kontaktieren, werden die von Ihnen
+          angegebenen Daten (z. B. Name, E-Mail-Adresse, Nachricht) zum Zweck der
+          Bearbeitung Ihrer Anfrage verarbeitet.
         </p>
         <p>
-          Section 3: Data retention and user rights. Lorem ipsum dolor sit amet,
-          consectetur adipiscing elit. Excepteur sint occaecat cupidatat non
-          proident.
+          Die Verarbeitung erfolgt auf Grundlage von Art. 6 Abs. 1 lit. b DSGVO
+          (vorvertragliche Maßnahmen) oder Art. 6 Abs. 1 lit. f DSGVO
+          (berechtigtes Interesse an der Bearbeitung von Anfragen).
+        </p>
+
+        <h2 className="font-semibold text-base mt-6">
+          4. Speicherdauer
+        </h2>
+        <p>
+          Ihre Daten werden nur so lange gespeichert, wie dies zur Bearbeitung
+          Ihrer Anfrage erforderlich ist oder gesetzliche Aufbewahrungspflichten
+          bestehen.
+        </p>
+
+        <h2 className="font-semibold text-base mt-6">
+          5. Ihre Rechte
+        </h2>
+        <p>
+          Sie haben das Recht auf Auskunft über Ihre gespeicherten Daten sowie auf
+          Berichtigung, Löschung oder Einschränkung der Verarbeitung. Außerdem
+          haben Sie das Recht auf Datenübertragbarkeit.
+        </p>
+        <p>
+          Sie können der Verarbeitung Ihrer Daten jederzeit widersprechen, sofern
+          diese auf Art. 6 Abs. 1 lit. f DSGVO beruht.
+        </p>
+        <p>
+          Zudem haben Sie das Recht, sich bei einer Aufsichtsbehörde zu beschweren.
+        </p>
+
+        <h2 className="font-semibold text-base mt-6">
+          6. Keine Verwendung von Tracking-Tools
+        </h2>
+        <p>
+          Diese Website verwendet keine Analyse- oder Tracking-Tools und setzt
+          keine zustimmungspflichtigen Cookies ein.
+        </p>
+
+        <h2 className="font-semibold text-base mt-6">
+          7. Schriftarten
+        </h2>
+        <p>
+          Die auf dieser Website verwendeten Schriftarten sind lokal eingebunden.
+          Es erfolgt keine Verbindung zu Servern von Drittanbietern (z. B. Google).
         </p>
       </div>
     </section>
-  )
+  );
 }

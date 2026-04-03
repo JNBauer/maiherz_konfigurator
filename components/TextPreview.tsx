@@ -38,6 +38,7 @@ const MIN_HEART_HEIGHT_CM = 10
 const MAX_HEART_HEIGHT_CM = 50
 const PRICE_PER_M2_EUR = 40
 const HEART_TEXT_MARGIN_MM = 10
+const LASER_TEST_THRESHOLD_MM = 4
 const ENGRAVE_DEPTH_MM = 0.3
 const HEART_VARIANTS = Array.from({ length: 8 }, (_, index) => {
   return `/hearts/Herzvariante_${index + 1}.svg`
@@ -45,11 +46,11 @@ const HEART_VARIANTS = Array.from({ length: 8 }, (_, index) => {
 const tabs = ["Grundlagen", "Design", "Vorschau"] as const
 
 export default function TextPreview() {
-  const [nameValue, setNameValue] = useState("Julian")
-  const [widthCm, setWidthCm] = useState(40)
-  const [includeHeart, setIncludeHeart] = useState(false)
-  const [heartWidthCm, setHeartWidthCm] = useState(30)
-  const [heartHeightCm, setHeartHeightCm] = useState(30)
+  const [nameValue, setNameValue] = useState("Name")
+  const [widthCm, setWidthCm] = useState(25)
+  const [includeHeart, setIncludeHeart] = useState(true)
+  const [heartWidthCm, setHeartWidthCm] = useState(40)
+  const [heartHeightCm, setHeartHeightCm] = useState(40)
   const [textMaterial, setTextMaterial] = useState<TextMaterialKey>("mdf")
   const [heartMaterial, setHeartMaterial] = useState<MaterialKey>("mdf")
   const [heartVariant, setHeartVariant] = useState(HEART_VARIANTS[0])
@@ -61,9 +62,10 @@ export default function TextPreview() {
     (typeof THICKNESS_OPTIONS_MM)[number]
   >(5)
   const [spacing, setSpacing] = useState(0.02)
-  const [textOffsetYcm, setTextOffsetYcm] = useState(0)
+  const [textOffsetYcm, setTextOffsetYcm] = useState(2)
   const [activeTab, setActiveTab] =
     useState<(typeof tabs)[number]>("Grundlagen")
+  const textOffsetDisplayCm = useMemo(() => textOffsetYcm - 2, [textOffsetYcm])
 
   const [fontOptions, setFontOptions] = useState<FontOption[]>([])
   const [selectedFontFile, setSelectedFontFile] = useState(
@@ -258,7 +260,7 @@ export default function TextPreview() {
         parsedFont,
         widthCm,
         spacing,
-        MIN_LASER_CUT_LINE_DISTANCE_MM
+        LASER_TEST_THRESHOLD_MM
       ),
     })
 
@@ -675,8 +677,8 @@ export default function TextPreview() {
             onHeartThicknessChange={setHeartThicknessMm}
             spacing={spacing}
             onSpacingChange={setSpacing}
-            textOffsetYcm={textOffsetYcm}
-            onTextOffsetYChange={setTextOffsetYcm}
+            textOffsetYcm={textOffsetDisplayCm}
+            onTextOffsetYChange={(value) => setTextOffsetYcm(value + 2)}
             engravingMode={isEngraved}
             laserSafety={laserSafety}
             textFitResult={textFitResult}
@@ -753,6 +755,16 @@ fov:     ${cameraDebug.fov}`}
                   onChange={(e) => setContactMessage(e.target.value)}
                 />
               </label>
+              <p className="text-xs leading-5 text-stone-600">
+                Mit dem Absenden des Formulars erklaeren Sie sich damit
+                einverstanden, dass Ihre Angaben zur Bearbeitung Ihrer Anfrage
+                verarbeitet werden. Weitere Informationen finden Sie in unserer
+                Datenschutzerklaerung.
+              </p>
+              <p className="text-xs leading-5 text-stone-600">
+                Die ueber den Konfigurator uebermittelten Anfragen stellen kein
+                verbindliches Angebot dar.
+              </p>
               <button
                 type="button"
                 onClick={handleSendRequest}

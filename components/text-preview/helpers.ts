@@ -4,7 +4,7 @@ import type { Font } from "three/examples/jsm/loaders/FontLoader.js"
 
 // Calibration: tuned to match the cutting-mat cm scale in the scene.
 export const WIDTH_CM_TO_SCENE_SIZE = 0.0099
-export const MIN_LASER_CUT_LINE_DISTANCE_MM = 5
+export const MIN_LASER_CUT_LINE_DISTANCE_MM = 4
 
 export const MATERIAL_OPTIONS = [
   { key: "mdf", label: "MDF" },
@@ -274,6 +274,38 @@ export function evaluateLaserCutSafety(
     }
   }
 
+  const boundarySegments: Array<{
+    a: THREE.Vector2
+    b: THREE.Vector2
+    dir: THREE.Vector2
+    mid: THREE.Vector2
+    length: number
+  }> = []
+
+  function addSegments(points: THREE.Vector2[]) {
+    if (points.length < 2) return
+    const isClosed =
+      points[0].distanceToSquared(points[points.length - 1]) < 1e-8
+    const count = isClosed ? points.length - 1 : points.length
+
+    for (let i = 0; i < count; i++) {
+      const a = points[i]
+      const b = points[(i + 1) % points.length]
+      const length = a.distanceTo(b)
+      if (length < 0.25) continue
+      const dir = new THREE.Vector2((b.x - a.x) / length, (b.y - a.y) / length)
+      const mid = new THREE.Vector2((a.x + b.x) / 2, (a.y + b.y) / 2)
+      boundarySegments.push({ a, b, dir, mid, length })
+    }
+  }
+
+  for (const region of regions) {
+    addSegments(region.outer)
+    for (const hole of region.holes) {
+      addSegments(hole)
+    }
+  }
+
   let minX = Number.POSITIVE_INFINITY
   let minY = Number.POSITIVE_INFINITY
   let maxX = Number.NEGATIVE_INFINITY
@@ -479,8 +511,59 @@ export function evaluateLaserCutSafety(
   }
 
   const skeletonValues: number[] = []
+  const acceptedSkeletonValues: number[] = []
   let minSkeletonValue = Number.POSITIVE_INFINITY
   let minSkeletonPoint: [number, number] | null = null
+  let minAcceptedValue = Number.POSITIVE_INFINITY
+  let minAcceptedPoint: [number, number] | null = null
+
+  function isOpposingParallelOutlines(point: THREE.Vector2) {
+    if (boundarySegments.length < 2) return false
+    const maxNeighbors = Math.min(8, boundarySegments.length)
+    const nearest: Array<{ segment: (typeof boundarySegments)[number]; dist: number }> = []
+
+    for (const seg of boundarySegments) {
+      const dist = distancePointToSegment(point, seg.a, seg.b)
+      if (nearest.length < maxNeighbors) {
+        nearest.push({ segment: seg, dist })
+        nearest.sort((a, b) => a.dist - b.dist)
+      } else if (dist < nearest[nearest.length - 1].dist) {
+        nearest[nearest.length - 1] = { segment: seg, dist }
+        nearest.sort((a, b) => a.dist - b.dist)
+      }
+    }
+
+    if (nearest.length < 2) return false
+
+    const parallelDot = 0.92
+    const opposingDot = -0.88
+
+    for (let i = 0; i < nearest.length; i++) {
+      const segA = nearest[i].segment
+      const v1x = segA.mid.x - point.x
+      const v1y = segA.mid.y - point.y
+      const v1Len = Math.hypot(v1x, v1y)
+      if (v1Len <= Number.EPSILON) continue
+
+      for (let j = i + 1; j < nearest.length; j++) {
+        const segB = nearest[j].segment
+        const dirDot = Math.abs(segA.dir.dot(segB.dir))
+        if (dirDot < parallelDot) continue
+
+        const v2x = segB.mid.x - point.x
+        const v2y = segB.mid.y - point.y
+        const v2Len = Math.hypot(v2x, v2y)
+        if (v2Len <= Number.EPSILON) continue
+
+        const vDot = (v1x * v2x + v1y * v2y) / (v1Len * v2Len)
+        if (vDot > opposingDot) continue
+
+        return true
+      }
+    }
+
+    return false
+  }
 
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < cols; x++) {
@@ -510,12 +593,26 @@ export function evaluateLaserCutSafety(
           const py = minY + (y + 0.5) * cellMm
           minSkeletonPoint = [px, py]
         }
+
+        const px = minX + (x + 0.5) * cellMm
+        const py = minY + (y + 0.5) * cellMm
+        if (isOpposingParallelOutlines(new THREE.Vector2(px, py))) {
+          acceptedSkeletonValues.push(value)
+          if (value < minAcceptedValue) {
+            minAcceptedValue = value
+            minAcceptedPoint = [px, py]
+          }
+        }
       }
     }
   }
 
   const minimumDistanceMm =
-    skeletonValues.length > 0 ? Math.min(...skeletonValues) : null
+    acceptedSkeletonValues.length > 0
+      ? Math.min(...acceptedSkeletonValues)
+      : skeletonValues.length > 0
+        ? Math.min(...skeletonValues)
+        : null
 
   if (minimumDistanceMm === null) {
     return {
@@ -529,7 +626,7 @@ export function evaluateLaserCutSafety(
     isSafe: minimumDistanceMm >= thresholdMm,
     minimumDistanceMm,
     thresholdMm,
-    debugPointMm: minSkeletonPoint ?? undefined,
+    debugPointMm: minAcceptedPoint ?? minSkeletonPoint ?? undefined,
   }
 }
 

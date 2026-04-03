@@ -9,9 +9,10 @@
 - [X] Control y position of the text on the heart, higher/lower
 - [ ] Reduce laggyness after having the page loaded for some time
 - [ ] Add hdr like lighting to the scene, slightly stronger shaddows
-- [ ] Improve the heart switch on. slide button would be nicer
+- [X] Improve the heart switch on. slide button would be nicer
 - [X] Add a few more heart shapes (like rounder heart)
-
+- [ ] Implement an automatic E-Mail messenger with a new order
+- [ ] Add the possibility to download the designed heart + text as pdf blueprint design, that can be printed on paper and used as a schablone
 
 
 
