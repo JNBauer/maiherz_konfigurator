@@ -11,7 +11,7 @@
 - [X] Improve the heart switch on. slide button would be nicer
 - [X] Add a few more heart shapes (like rounder heart)
 - [ ] Implement an automatic E-Mail messenger with a new order
-- [ ] Add the possibility to download the designed heart + text as pdf blueprint design, that can be printed on paper and used as a schablone
+- [X] Add the possibility to download the designed heart + text as pdf blueprint design, that can be printed on paper and used as a schablone
 
 
 
@@ -20,3 +20,15 @@ IN BLENDER
 - [X] Fix glue bottle
 - [X] Extend the workbech a bit on the left
  
+
+
+V02
+- [X] Separate TEXT and HERZ into two windows, one on the right, the other one left
+- [ ] Lazy-load the 3D scene for better SEO
+- [ ] Nicer loading screen (changing heart, name combinations)
+- [ ] Proper font acknowledgment
+- [ ] Add a nice blurry background image
+- [ ] Improve SEO
+- [ ] Fix the Impressum, Datenschutz buttons
+- [ ] Add text explaining the Download & Print
+- [ ] Add umami.js

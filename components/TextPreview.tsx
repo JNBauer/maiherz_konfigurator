@@ -2,7 +2,7 @@
 
 import { Canvas } from "@react-three/fiber"
 import { GizmoHelper, GizmoViewport } from "@react-three/drei"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js"
 import type { Font } from "three/examples/jsm/loaders/FontLoader.js"
 import * as THREE from "three"
@@ -30,8 +30,10 @@ import {
   type TextMaterialKey,
 } from "./text-preview/helpers"
 
-const MIN_WIDTH_CM = 10
-const MAX_WIDTH_CM = 80
+const MIN_TEXT_HEIGHT_CM = 5
+const MAX_TEXT_HEIGHT_CM = 22
+const DEFAULT_TEXT_HEIGHT_CM = 7.5
+const DEFAULT_TEXT_ASPECT_RATIO = 0.3
 const MIN_HEART_WIDTH_CM = 10
 const MAX_HEART_WIDTH_CM = 70
 const MIN_HEART_HEIGHT_CM = 10
@@ -43,15 +45,15 @@ const ENGRAVE_DEPTH_MM = 0.3
 const HEART_VARIANTS = Array.from({ length: 8 }, (_, index) => {
   return `/hearts/Herzvariante_${index + 1}.svg`
 })
-const tabs = ["Grundlagen", "Design", "Vorschau"] as const
+const tabs = ["Design", "Vorschau"] as const
 
 export default function TextPreview() {
   const [nameValue, setNameValue] = useState("Name")
-  const [widthCm, setWidthCm] = useState(25)
+  const [textHeightCm, setTextHeightCm] = useState(DEFAULT_TEXT_HEIGHT_CM)
   const [includeHeart, setIncludeHeart] = useState(true)
   const [heartWidthCm, setHeartWidthCm] = useState(40)
-  const [heartHeightCm, setHeartHeightCm] = useState(40)
-  const [textMaterial, setTextMaterial] = useState<TextMaterialKey>("mdf")
+  const [heartHeightCm, setHeartHeightCm] = useState(35)
+  const [textMaterial, setTextMaterial] = useState<TextMaterialKey>("multiplex")
   const [heartMaterial, setHeartMaterial] = useState<MaterialKey>("mdf")
   const [heartVariant, setHeartVariant] = useState(HEART_VARIANTS[0])
   const [heartSvg, setHeartSvg] = useState<string | null>(null)
@@ -64,7 +66,7 @@ export default function TextPreview() {
   const [spacing, setSpacing] = useState(0.02)
   const [textOffsetYcm, setTextOffsetYcm] = useState(2)
   const [activeTab, setActiveTab] =
-    useState<(typeof tabs)[number]>("Grundlagen")
+    useState<(typeof tabs)[number]>("Design")
   const textOffsetDisplayCm = useMemo(() => textOffsetYcm - 2, [textOffsetYcm])
 
   const [fontOptions, setFontOptions] = useState<FontOption[]>([])
@@ -102,6 +104,7 @@ export default function TextPreview() {
   const hasText = nameValue.trim().length > 0
   const hasHeart = includeHeart
   const isEngraved = hasHeart && textMaterial === "engraving"
+  const didInitTextHeight = useRef(false)
 
   const textDepth = useMemo(() => textThicknessMm / 1000, [textThicknessMm])
   const heartDepth = useMemo(() => heartThicknessMm / 1000, [heartThicknessMm])
@@ -115,14 +118,27 @@ export default function TextPreview() {
     return buildLayout(nameValue, parsedFont, 1, spacing)
   }, [nameValue, parsedFont, spacing])
   const textAspectRatio = useMemo(() => {
-    if (!hasText || !textMetrics) return 0.3
+    if (!hasText || !textMetrics) return DEFAULT_TEXT_ASPECT_RATIO
     return textMetrics.totalHeight / Math.max(textMetrics.totalWidth, 0.0001)
   }, [hasText, textMetrics])
+  const safeTextAspectRatio =
+    textAspectRatio > 0 ? textAspectRatio : DEFAULT_TEXT_ASPECT_RATIO
+  const heightCm = textHeightCm
+  const widthCm = useMemo(() => {
+    return heightCm / safeTextAspectRatio
+  }, [heightCm, safeTextAspectRatio])
+  const minTextHeightCm = MIN_TEXT_HEIGHT_CM
+  const maxTextHeightCm = MAX_TEXT_HEIGHT_CM
 
-  const heightCm = useMemo(() => {
-    if (!hasText) return 0
-    return widthCm * textAspectRatio
-  }, [hasText, widthCm, textAspectRatio])
+  useEffect(() => {
+    if (didInitTextHeight.current) return
+    if (!parsedFont || !hasText) return
+    const initialHeight = DEFAULT_TEXT_HEIGHT_CM
+    setTextHeightCm(
+      Math.min(MAX_TEXT_HEIGHT_CM, Math.max(MIN_TEXT_HEIGHT_CM, initialHeight))
+    )
+    didInitTextHeight.current = true
+  }, [hasText, parsedFont, safeTextAspectRatio])
 
   const laserSafetyKey = useMemo(
     () =>
@@ -228,12 +244,14 @@ export default function TextPreview() {
     return [...THICKNESS_OPTIONS_MM]
   }, [])
 
-  function clampWidthCm(next: number) {
-    return Math.min(MAX_WIDTH_CM, Math.max(MIN_WIDTH_CM, next))
+  function clampTextHeightCm(next: number) {
+    return Math.min(maxTextHeightCm, Math.max(minTextHeightCm, next))
   }
 
-  function handleWidthChange(next: number) {
-    setWidthCm(clampWidthCm(next))
+  function handleTextHeightChange(next: number) {
+    const clampedHeight = clampTextHeightCm(next)
+    didInitTextHeight.current = true
+    setTextHeightCm(clampedHeight)
   }
 
   function clampHeartWidthCm(next: number) {
@@ -526,30 +544,44 @@ export default function TextPreview() {
   return (
     <div className="min-h-screen w-full bg-stone-100">
       <header
-        className="relative overflow-hidden bg-cover bg-center px-4 py-10 md:px-8 md:py-12"
+        className="relative mt-4 overflow-hidden bg-cover bg-center px-4 py-10 md:px-8 md:py-12"
         style={{ backgroundImage: "url('/birkenstamm.png')" }}
       >
         <div className="absolute inset-0 bg-white/45" />
-        <div className="relative flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-          <h1 className="text-4xl font-semibold tracking-wide text-red-700 md:text-6xl">
-            Maiherz-Konfigurator
-          </h1>
+        <div className="relative grid gap-6 md:grid-cols-[1fr_auto_1fr] md:items-center">
+          <div className="hidden md:block" />
 
-          <div className="flex flex-wrap items-center gap-3">
-            {tabs.map((tab) => (
-              <button
-                key={tab}
-                type="button"
-                onClick={() => setActiveTab(tab)}
-                className={`rounded-full px-5 py-2 text-sm font-medium transition ${
-                  activeTab === tab
-                    ? "bg-amber-200 text-amber-950"
-                    : "bg-white/25 text-amber-50 hover:bg-white/35"
-                }`}
+          <div className="flex items-center justify-center md:col-start-2">
+            <img
+              src="/hero_text_maiherz.svg"
+              alt="Kreiere dein persoenliches Maiherz"
+              className="h-24 w-auto md:h-36"
+            />
+          </div>
+
+          <div className="flex flex-col items-center md:col-start-3 md:items-end">
+            <div className="flex min-w-[12rem] flex-col items-stretch gap-2">
+              <a
+                href="/ueber-mich"
+                className="rounded-full bg-amber-900/60 px-5 py-2 text-center text-sm font-medium text-amber-50 transition hover:bg-amber-900/70"
               >
-                {tab}
-              </button>
-            ))}
+                Über mich
+              </a>
+
+                            <a
+                href="/konfigurator"
+                className="rounded-full bg-amber-900/60 px-5 py-2 text-center text-sm font-medium text-amber-50 transition hover:bg-amber-900/70"
+              >
+                Konfigurator
+              </a>
+
+              <a
+                href="/acknowledgment"
+                className="rounded-full bg-amber-900/60 px-5 py-2 text-center text-sm font-medium text-amber-50 transition hover:bg-amber-900/70"
+              >
+                Acknowledgments
+              </a>
+            </div>
           </div>
         </div>
       </header>
@@ -699,12 +731,7 @@ export default function TextPreview() {
               onDebugChange={setCameraDebug}
             />
 
-            <GizmoHelper alignment="bottom-right" margin={[80, 80]}>
-              <GizmoViewport
-                axisColors={["red", "green", "blue"]}
-                labelColor="white"
-              />
-            </GizmoHelper>
+            {null}
           </Canvas>
 
           {showSceneLoading && (
@@ -725,10 +752,10 @@ export default function TextPreview() {
             selectedFontFile={selectedFontFile}
             onSelectFont={setSelectedFontFile}
             widthCm={widthCm}
-            minWidthCm={MIN_WIDTH_CM}
-            maxWidthCm={MAX_WIDTH_CM}
-            onWidthChange={handleWidthChange}
             heightCm={heightCm}
+            minTextHeightCm={minTextHeightCm}
+            maxTextHeightCm={maxTextHeightCm}
+            onTextHeightChange={handleTextHeightChange}
             heartWidthCm={heartWidthCm}
             minHeartWidthCm={MIN_HEART_WIDTH_CM}
             maxHeartWidthCm={MAX_HEART_WIDTH_CM}
@@ -763,30 +790,8 @@ export default function TextPreview() {
             onRunLaserTest={handleRunLaserTest}
           />
 
-          {cameraDebug && (
-            <div className="pointer-events-none absolute bottom-4 left-4 z-30 whitespace-pre rounded-md bg-slate-900/85 px-3 py-2 font-mono text-[11px] leading-[1.35] text-slate-200">
-              {`pos:     ${cameraDebug.pos[0]}, ${cameraDebug.pos[1]}, ${cameraDebug.pos[2]}
-rotDeg:  ${cameraDebug.rotDeg[0]}, ${cameraDebug.rotDeg[1]}, ${cameraDebug.rotDeg[2]}
-target:  ${cameraDebug.target[0]}, ${cameraDebug.target[1]}, ${cameraDebug.target[2]}
-polar:   ${cameraDebug.polarDeg} deg
-azim:    ${cameraDebug.azimuthDeg} deg
-dist:    ${cameraDebug.distance}
-fov:     ${cameraDebug.fov}`}
-            </div>
-          )}
+          {null}
         </div>
-
-        <section className="mx-auto mt-4 w-[90%] rounded-xl border border-stone-300 bg-white p-4 md:mt-5 md:p-5">
-          <h3 className="text-lg font-semibold text-stone-800">
-            Richtpreis (grob)
-          </h3>
-          <div className="mt-3 text-sm text-stone-700">
-            <div>Flaeche gesamt: {roughAreaM2.toFixed(3)} m2</div>
-            <div className="mt-1 text-base font-semibold text-stone-900">
-              {priceFormatter.format(roughPriceEur)}
-            </div>
-          </div>
-        </section>
 
         <section className="mx-auto mt-4 w-[90%] pb-6 md:mt-5 md:pb-8">
           <div className="grid gap-4 md:grid-cols-2">
@@ -845,9 +850,22 @@ fov:     ${cameraDebug.fov}`}
               </div>
             </article>
 
-            <article className="rounded-xl border border-stone-300 bg-white p-4 md:p-5">
-              <h3 className="text-lg font-semibold text-stone-800">Kontakt</h3>
-              <form className="mt-4 grid gap-3">
+            <div className="flex flex-col gap-4">
+              <article className="rounded-xl border border-stone-300 bg-white p-4 md:p-5">
+                <h3 className="text-lg font-semibold text-stone-800">
+                  Richtpreis (grob)
+                </h3>
+                <div className="mt-3 text-sm text-stone-700">
+                  <div>Flaeche gesamt: {roughAreaM2.toFixed(3)} m2</div>
+                  <div className="mt-1 text-base font-semibold text-stone-900">
+                    {priceFormatter.format(roughPriceEur)}
+                  </div>
+                </div>
+              </article>
+
+              <article className="rounded-xl border border-stone-300 bg-white p-4 md:p-5">
+                <h3 className="text-lg font-semibold text-stone-800">Kontakt</h3>
+                <form className="mt-4 grid gap-3">
                 <label className="grid gap-1 text-sm text-stone-700">
                   Vollstaendiger Name
                   <input
@@ -916,8 +934,9 @@ fov:     ${cameraDebug.fov}`}
                 {requestStatus === "error" && requestError && (
                   <p className="text-sm text-rose-700">{requestError}</p>
                 )}
-              </form>
-            </article>
+                </form>
+              </article>
+            </div>
           </div>
         </section>
 

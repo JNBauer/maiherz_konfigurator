@@ -82,7 +82,7 @@ export async function POST(request: Request) {
       `Herz aktiv: ${body.includeHeart ? "Ja" : "Nein"}`,
       `Herz Variante: ${body.heartVariant}`,
       `Herz Material: ${body.heartMaterial}`,
-      `Herz Groesse: ${body.heartWidthCm} x ${body.heartHeightCm} cm`,
+      `Herz Größe: ${body.heartWidthCm} x ${body.heartHeightCm} cm`,
       `Herz Dicke: ${body.heartThicknessMm} mm`,
       `Text: ${body.text}`,
       `Text Breite: ${body.textWidthCm} cm`,
@@ -114,7 +114,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error(error)
     return NextResponse.json(
-      { error: "Senden fehlgeschlagen. Bitte SMTP-Konfiguration pruefen." },
+      { error: "Senden fehlgeschlagen. Bitte SMTP-Konfiguration prüfen." },
       { status: 500 }
     )
   }

@@ -55,10 +55,10 @@ type ConfiguratorPanelProps = {
   selectedFontFile: string
   onSelectFont: (file: string) => void
   widthCm: number
-  minWidthCm: number
-  maxWidthCm: number
-  onWidthChange: (value: number) => void
   heightCm: number
+  minTextHeightCm: number
+  maxTextHeightCm: number
+  onTextHeightChange: (value: number) => void
   heartWidthCm: number
   minHeartWidthCm: number
   maxHeartWidthCm: number
@@ -131,10 +131,10 @@ export default function ConfiguratorPanel({
   selectedFontFile,
   onSelectFont,
   widthCm,
-  minWidthCm,
-  maxWidthCm,
-  onWidthChange,
   heightCm,
+  minTextHeightCm,
+  maxTextHeightCm,
+  onTextHeightChange,
   heartWidthCm,
   minHeartWidthCm,
   maxHeartWidthCm,
@@ -188,19 +188,25 @@ export default function ConfiguratorPanel({
     }
   }, [])
 
-  return (
-    <div className="absolute right-10 top-8 z-20 flex max-h-[calc(100%-4rem)] w-[clamp(17rem,28vw,22rem)] max-w-[calc(100%-2.5rem)] flex-col gap-4 overflow-y-auto">
-      <section className="rounded-xl bg-stone-950/20 p-4 text-amber-50 backdrop-blur-sm">
-        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-amber-100/80">
-          Text
-        </h3>
+  const inputBase =
+    "w-full rounded-lg border border-amber-200/30 bg-stone-900/80 px-3 py-2 text-amber-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] placeholder:text-amber-100/50 transition-colors focus:border-amber-200/70 focus:outline-none focus:ring-2 focus:ring-amber-200/25 hover:border-amber-200/50"
+  const numberInputBase =
+    "w-16 rounded-md border border-amber-200/30 bg-stone-900/80 px-2 py-1 text-xs text-amber-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] transition-colors focus:border-amber-200/70 focus:outline-none focus:ring-2 focus:ring-amber-200/25 hover:border-amber-200/50"
+  const selectButtonBase =
+    "flex w-full items-center justify-between rounded-lg border border-amber-200/30 bg-stone-900/80 px-3 py-2 text-left text-amber-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] transition-colors hover:border-amber-200/60 focus:outline-none focus:ring-2 focus:ring-amber-200/25"
+
+  const textSection = (
+    <section className="rounded-xl bg-stone-950/20 p-4 text-amber-50 backdrop-blur-sm">
+      <h3 className="mb-3 text-sm font-semibold tracking-wide text-amber-100/80">
+        Text-Design
+      </h3>
         <label className="flex flex-col gap-1 text-sm">
           Name
           <div className="relative">
             <input
               value={nameValue}
               onChange={(e) => onNameChange(sanitizeNameInput(e.target.value))}
-              className="w-full rounded border border-white/35 bg-white/85 p-2 pr-44 text-stone-900"
+              className={`${inputBase} pr-44`}
               placeholder="Name"
               maxLength={20}
             />
@@ -209,7 +215,7 @@ export default function ConfiguratorPanel({
               <button
                 type="button"
                 onClick={() => onNameChange(toTitleCase(nameValue))}
-                className="rounded bg-stone-800/80 px-2 py-1 text-[10px] text-stone-100 hover:bg-stone-800"
+                className="rounded bg-amber-200/20 px-2 py-1 text-[10px] text-amber-50 hover:bg-amber-200/30"
               >
                 Title Case
               </button>
@@ -217,7 +223,7 @@ export default function ConfiguratorPanel({
               <button
                 type="button"
                 onClick={() => onNameChange(nameValue.toUpperCase())}
-                className="rounded bg-stone-800/80 px-2 py-1 text-[10px] text-stone-100 hover:bg-stone-800"
+                className="rounded bg-amber-200/20 px-2 py-1 text-[10px] text-amber-50 hover:bg-amber-200/30"
               >
                 CAPITALIZED
               </button>
@@ -226,20 +232,20 @@ export default function ConfiguratorPanel({
         </label>
 
         <div ref={fontMenuRef} className="relative">
-          <div className="mb-1 text-sm">Font type</div>
+          <div className="mb-1 text-sm">Schriftart</div>
           <button
             type="button"
             onClick={() => setFontMenuOpen((open) => !open)}
-            className="flex w-full items-center justify-between rounded border border-white/35 bg-white/85 px-3 py-2 text-left text-stone-900"
+            className={selectButtonBase}
           >
             <span className={getFontPreviewClass(activeFontOption?.label ?? "")}>
               {activeFontOption?.label ?? "Font waehlen"}
             </span>
-            <span className="ml-3 text-xs text-stone-600">v</span>
+            <span className="ml-3 text-xs text-amber-100/70">v</span>
           </button>
 
           {fontMenuOpen && (
-            <div className="absolute left-0 right-0 top-[calc(100%+6px)] z-40 max-h-52 overflow-y-auto rounded border border-stone-300 bg-white shadow-lg">
+            <div className="absolute left-0 right-0 top-[calc(100%+6px)] z-40 max-h-52 overflow-y-auto rounded-lg border border-amber-200/30 bg-stone-950/95 shadow-[0_12px_30px_rgba(0,0,0,0.45)]">
               {fontOptions.map((option) => (
                 <button
                   key={option.file}
@@ -248,11 +254,13 @@ export default function ConfiguratorPanel({
                     onSelectFont(option.file)
                     setFontMenuOpen(false)
                   }}
-                  className={`flex w-full items-center justify-between px-3 py-2 text-left text-stone-900 hover:bg-stone-100 ${getFontPreviewClass(option.label)}`}
+                  className={`flex w-full items-center justify-between px-3 py-2 text-left text-amber-50 hover:bg-amber-200/10 ${
+                    option.file === selectedFontFile ? "bg-amber-200/15" : ""
+                  } ${getFontPreviewClass(option.label)}`}
                 >
                   <span>{option.label}</span>
                   {option.file === selectedFontFile && (
-                    <span className="text-xs text-stone-500">ok</span>
+                    <span className="text-xs text-amber-100/80">ok</span>
                   )}
                 </button>
               ))}
@@ -261,29 +269,29 @@ export default function ConfiguratorPanel({
         </div>
 
         <label className="flex flex-col gap-1 text-sm">
-          Text Groesse ({widthCm.toFixed(1)} x {heightCm.toFixed(1)} cm)
+          Größe ({widthCm.toFixed(1)} x {heightCm.toFixed(1)} cm)
           <div className="flex items-center gap-2">
             <input
               type="range"
-              min={minWidthCm}
-              max={maxWidthCm}
+              min={minTextHeightCm}
+              max={maxTextHeightCm}
               step="0.1"
-              value={widthCm}
-              onChange={(e) => onWidthChange(Number(e.target.value))}
-              className="w-full"
+              value={heightCm}
+              onChange={(e) => onTextHeightChange(Number(e.target.value))}
+              className="w-full accent-amber-300"
             />
             <input
               type="number"
-              min={minWidthCm}
-              max={maxWidthCm}
+              min={minTextHeightCm}
+              max={maxTextHeightCm}
               step={0.1}
-              value={Number(widthCm.toFixed(1))}
+              value={Number(heightCm.toFixed(1))}
               onChange={(e) => {
                 const next = Number(e.target.value)
                 if (Number.isNaN(next)) return
-                onWidthChange(next)
+                onTextHeightChange(next)
               }}
-              className="w-16 rounded border border-white/35 bg-white/85 px-2 py-1 text-xs text-stone-900"
+              className={`${numberInputBase} number-input text-right`}
             />
           </div>
         </label>
@@ -297,11 +305,12 @@ export default function ConfiguratorPanel({
             step="0.005"
             value={spacing}
             onChange={(e) => onSpacingChange(Number(e.target.value))}
+            className="accent-amber-300"
           />
         </label>
 
         <label className="mt-3 flex flex-col gap-1 text-sm">
-          Text Position Y ( {textOffsetYcm.toFixed(1)} cm )
+          Vertikale Position ( {textOffsetYcm.toFixed(1)} cm )
           <div className="flex items-center gap-2">
             <input
               type="range"
@@ -310,7 +319,7 @@ export default function ConfiguratorPanel({
               step={0.1}
               value={textOffsetYcm}
               onChange={(e) => onTextOffsetYChange(Number(e.target.value))}
-              className="w-full"
+              className="w-full accent-amber-300"
             />
             <input
               type="number"
@@ -323,13 +332,13 @@ export default function ConfiguratorPanel({
                 if (Number.isNaN(next)) return
                 onTextOffsetYChange(next)
               }}
-              className="w-16 rounded border border-white/35 bg-white/85 px-2 py-1 text-xs text-stone-900"
+              className={`${numberInputBase} number-input text-right`}
             />
           </div>
         </label>
 
         <div className="mt-3 flex flex-col gap-1 text-sm">
-          Material (Text)
+          Material
           <div className="flex flex-wrap gap-2">
             {textMaterialOptions.map((option) => {
               const active = textMaterial === option.key
@@ -365,7 +374,7 @@ export default function ConfiguratorPanel({
         </div>
 
         <div className={`mt-3 flex flex-col gap-1 text-sm ${engravingMode ? "opacity-60" : ""}`}>
-          Dicke (Text) ({textThicknessMm} mm)
+          Dicke ({textThicknessMm} mm)
           <div className="flex flex-wrap gap-2">
             {thicknessOptions.map((option) => {
               const active = textThicknessMm === option
@@ -399,11 +408,13 @@ export default function ConfiguratorPanel({
           </div>
         </div>
       </section>
+  )
 
-      <section className="rounded-xl bg-stone-950/20 p-4 text-amber-50 backdrop-blur-sm">
+  const heartSection = (
+    <section className="rounded-xl bg-stone-950/20 p-4 text-amber-50 backdrop-blur-sm">
         <div className="mb-3 flex items-center justify-between gap-3">
-          <h3 className="text-sm font-semibold uppercase tracking-wide text-amber-100/80">
-            Herz
+          <h3 className="text-sm font-semibold tracking-wide text-amber-100/80">
+            Herz-Design
           </h3>
           <label className="flex items-center gap-3 text-xs font-semibold text-amber-100/90">
             Herz aktiv
@@ -422,7 +433,7 @@ export default function ConfiguratorPanel({
 
         <div className={includeHeart ? "" : "opacity-60"}>
           <div className="mb-3">
-            <div className="mb-2 text-xs uppercase tracking-wide text-amber-100/80">
+            <div className="mb-2 text-xs tracking-wide text-amber-100/80">
               Herz Varianten
             </div>
             <div className="grid grid-cols-4 gap-2">
@@ -452,7 +463,7 @@ export default function ConfiguratorPanel({
           </div>
 
           <label className="flex flex-col gap-1 text-sm">
-            Herz Breite ({heartWidthCm.toFixed(1)} cm)
+            Breite ({heartWidthCm.toFixed(1)} cm)
             <div className="flex items-center gap-2">
               <input
                 type="range"
@@ -461,7 +472,7 @@ export default function ConfiguratorPanel({
                 step="0.1"
                 value={heartWidthCm}
                 onChange={(e) => onHeartWidthChange(Number(e.target.value))}
-                className="w-full"
+                className="w-full accent-amber-300"
                 disabled={!includeHeart}
               />
               <input
@@ -475,14 +486,14 @@ export default function ConfiguratorPanel({
                   if (Number.isNaN(next)) return
                   onHeartWidthChange(next)
                 }}
-                className="w-16 rounded border border-white/35 bg-white/85 px-2 py-1 text-xs text-stone-900"
+                className={`${numberInputBase} number-input text-right`}
                 disabled={!includeHeart}
               />
             </div>
           </label>
 
           <label className="mt-3 flex flex-col gap-1 text-sm">
-            Herz Hoehe ({heartHeightCm.toFixed(1)} cm)
+            Höhe ({heartHeightCm.toFixed(1)} cm)
             <div className="flex items-center gap-2">
               <input
                 type="range"
@@ -491,7 +502,7 @@ export default function ConfiguratorPanel({
                 step="0.1"
                 value={heartHeightCm}
                 onChange={(e) => onHeartHeightChange(Number(e.target.value))}
-                className="w-full"
+                className="w-full accent-amber-300"
                 disabled={!includeHeart}
               />
               <input
@@ -505,7 +516,7 @@ export default function ConfiguratorPanel({
                   if (Number.isNaN(next)) return
                   onHeartHeightChange(next)
                 }}
-                className="w-16 rounded border border-white/35 bg-white/85 px-2 py-1 text-xs text-stone-900"
+                className={`${numberInputBase} number-input text-right`}
                 disabled={!includeHeart}
               />
             </div>
@@ -513,7 +524,7 @@ export default function ConfiguratorPanel({
         </div>
 
         <div className={`mt-3 flex flex-col gap-1 text-sm ${includeHeart ? "" : "opacity-60"}`}>
-          Material (Herz)
+          Material
           <div className="flex flex-wrap gap-2">
             {heartMaterialOptions.map((option) => {
               const active = heartMaterial === option.key
@@ -548,7 +559,7 @@ export default function ConfiguratorPanel({
         </div>
 
         <div className={`mt-3 flex flex-col gap-1 text-sm ${includeHeart ? "" : "opacity-60"}`}>
-          Dicke (Herz) ({heartThicknessMm} mm)
+          Materialdicke ({heartThicknessMm} mm)
           <div className="flex flex-wrap gap-2">
             {thicknessOptions.map((option) => {
               const active = heartThicknessMm === option
@@ -582,8 +593,10 @@ export default function ConfiguratorPanel({
           </div>
         </div>
       </section>
+  )
 
-      <section className="rounded-xl bg-stone-950/20 p-4 text-amber-50 backdrop-blur-sm">
+  const laserSection = (
+    <section className="rounded-xl bg-stone-950/20 p-4 text-amber-50 backdrop-blur-sm">
         <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-amber-100/80">
           Laser
         </h3>
@@ -620,6 +633,19 @@ export default function ConfiguratorPanel({
           </p>
         )}
       </section>
+  )
+
+  return (
+    <div className="pointer-events-none absolute inset-0 z-20 flex items-center px-6">
+      <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="w-full max-w-[22rem] lg:w-[clamp(17rem,28vw,22rem)]">
+          <div className="pointer-events-auto">{heartSection}</div>
+        </div>
+        <div className="flex w-full max-w-[22rem] flex-col gap-4 lg:w-[clamp(17rem,28vw,22rem)]">
+          <div className="pointer-events-auto">{textSection}</div>
+          <div className="pointer-events-auto">{laserSection}</div>
+        </div>
+      </div>
     </div>
   )
 }
