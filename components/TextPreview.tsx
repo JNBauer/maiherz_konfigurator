@@ -11,6 +11,7 @@ import SceneCamera from "../components/SceneCamera"
 import type { CameraDebugState } from "../components/SceneCamera"
 import SceneLighting from "../components/SceneLighting"
 import WorkbenchScene from "../components/WorkbenchScene"
+import HeroHeader from "../components/HeroHeader"
 import ConfiguratorPanel from "./text-preview/ConfiguratorPanel"
 import PreviewHeart from "./text-preview/PreviewHeart"
 import PreviewLetters from "./text-preview/PreviewLetters"
@@ -104,6 +105,7 @@ export default function TextPreview() {
   const hasText = nameValue.trim().length > 0
   const hasHeart = includeHeart
   const isEngraved = hasHeart && textMaterial === "engraving"
+  const canRunLaserTest = Boolean(parsedFont && hasText)
   const didInitTextHeight = useRef(false)
 
   const textDepth = useMemo(() => textThicknessMm / 1000, [textThicknessMm])
@@ -162,6 +164,19 @@ export default function TextPreview() {
   const laserSafety =
     laserSafetyCheck?.key === laserSafetyKey ? laserSafetyCheck.result : null
   const textFitResult = textFitCheck?.key === textFitKey ? textFitCheck : null
+  const hasRunLaserTest =
+    Boolean(laserSafety) && (!hasHeart || Boolean(textFitResult))
+  const canSubmitRequest = hasRunLaserTest && requestStatus !== "sending"
+  const successIcon = (
+    <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
+      <svg viewBox="0 0 20 20" aria-hidden="true" className="h-3 w-3">
+        <path
+          fill="currentColor"
+          d="M7.6 13.2 4.7 10.3l1.4-1.4 1.5 1.5 6.1-6.1 1.4 1.4z"
+        />
+      </svg>
+    </span>
+  )
   const textFitMarkers = textFitResult?.result.debugPointsMm ?? []
   const heartBorder = textFitResult?.result.heartPolygonMm ?? []
   const textBorders = textFitResult?.result.textPolylinesMm ?? []
@@ -542,49 +557,8 @@ export default function TextPreview() {
   const showSceneLoading = !isSceneReady || (hasText && !parsedFont)
 
   return (
-    <div className="min-h-screen w-full bg-stone-100">
-      <header
-        className="relative mt-4 overflow-hidden bg-cover bg-center px-4 py-10 md:px-8 md:py-12"
-        style={{ backgroundImage: "url('/birkenstamm.png')" }}
-      >
-        <div className="absolute inset-0 bg-white/45" />
-        <div className="relative grid gap-6 md:grid-cols-[1fr_auto_1fr] md:items-center">
-          <div className="hidden md:block" />
-
-          <div className="flex items-center justify-center md:col-start-2">
-            <img
-              src="/hero_text_maiherz.svg"
-              alt="Kreiere dein persoenliches Maiherz"
-              className="h-24 w-auto md:h-36"
-            />
-          </div>
-
-          <div className="flex flex-col items-center md:col-start-3 md:items-end">
-            <div className="flex min-w-[12rem] flex-col items-stretch gap-2">
-              <a
-                href="/ueber-mich"
-                className="rounded-full bg-amber-900/60 px-5 py-2 text-center text-sm font-medium text-amber-50 transition hover:bg-amber-900/70"
-              >
-                Über mich
-              </a>
-
-                            <a
-                href="/konfigurator"
-                className="rounded-full bg-amber-900/60 px-5 py-2 text-center text-sm font-medium text-amber-50 transition hover:bg-amber-900/70"
-              >
-                Konfigurator
-              </a>
-
-              <a
-                href="/acknowledgment"
-                className="rounded-full bg-amber-900/60 px-5 py-2 text-center text-sm font-medium text-amber-50 transition hover:bg-amber-900/70"
-              >
-                Acknowledgments
-              </a>
-            </div>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen w-full bg-stone-100 pt-4">
+      <HeroHeader />
 
       <main className="w-full px-3 pb-4 pt-5 md:px-6 md:pt-7">
         <div className="relative mx-auto h-[82vh] min-h-[620px] w-[90%] overflow-hidden rounded-xl border border-stone-300 bg-stone-200">
@@ -786,7 +760,7 @@ export default function TextPreview() {
             engravingMode={isEngraved}
             laserSafety={laserSafety}
             textFitResult={textFitResult}
-            canRunLaserTest={Boolean(parsedFont && hasText)}
+            canRunLaserTest={canRunLaserTest}
             onRunLaserTest={handleRunLaserTest}
           />
 
@@ -794,16 +768,19 @@ export default function TextPreview() {
         </div>
 
         <section className="mx-auto mt-4 w-[90%] pb-6 md:mt-5 md:pb-8">
-          <div className="grid gap-4 md:grid-cols-2">
-            <article className="rounded-xl border border-stone-300 bg-white p-4 md:p-5">
-              <h3 className="text-lg font-semibold text-stone-800">
+          <div className="grid gap-6 md:grid-cols-2">
+            <article
+              className="relative overflow-hidden rounded-xl border border-amber-200/20 bg-stone-950/30 bg-center bg-cover bg-blend-multiply p-4 text-amber-50 shadow-[0_18px_45px_rgba(0,0,0,0.35)] md:p-5"
+              style={{ backgroundImage: "url('/plywood_diff_1k_darkened.jpg')" }}
+            >
+              <h3 className="text-lg font-semibold text-amber-100">
                 Download &amp; Print
               </h3>
-              <div className="mt-4 grid gap-3">
-                <label className="grid gap-1 text-sm text-stone-700">
+              <div className="mt-4 grid gap-3 text-amber-100/80">
+                <label className="grid gap-1 text-sm">
                   Papierformat
                   <select
-                    className="rounded border border-stone-300 px-3 py-2"
+                    className="rounded border border-amber-200/25 bg-stone-900/80 px-3 py-2 text-amber-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
                     value={printPaperSize}
                     onChange={(e) =>
                       setPrintPaperSize(e.target.value as "A4" | "A3")
@@ -813,14 +790,14 @@ export default function TextPreview() {
                     <option value="A3">A3</option>
                   </select>
                 </label>
-                <label className="grid gap-1 text-sm text-stone-700">
+                <label className="grid gap-1 text-sm">
                   Ueberlappung zum Zusammenkleben (mm)
                   <input
                     type="number"
                     min={0}
                     max={30}
                     step={1}
-                    className="rounded border border-stone-300 px-3 py-2"
+                    className="rounded border border-amber-200/25 bg-stone-900/80 px-3 py-2 text-amber-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
                     value={Number(printOverlapMm.toFixed(0))}
                     onChange={(e) => {
                       const next = Number(e.target.value)
@@ -829,7 +806,7 @@ export default function TextPreview() {
                     }}
                   />
                 </label>
-                <p className="text-xs leading-5 text-stone-600">
+                <p className="text-xs leading-5 text-amber-100/70">
                   Das PDF ist massstabgetreu. Grosse Designs werden automatisch
                   auf mehrere Seiten verteilt und mit Ueberlappungen markiert,
                   damit Sie sie einfach zusammenkleben koennen.
@@ -838,103 +815,186 @@ export default function TextPreview() {
                   type="button"
                   onClick={handleDownloadPdf}
                   disabled={printStatus === "loading"}
-                  className="mt-2 rounded border border-stone-300 bg-white px-4 py-2 text-sm font-medium text-stone-900 hover:bg-stone-50 disabled:cursor-not-allowed disabled:bg-stone-100"
+                  className="mt-2 rounded border border-amber-200/30 bg-amber-100/15 px-4 py-2 text-sm font-medium text-amber-50 transition hover:bg-amber-100/25 disabled:cursor-not-allowed disabled:border-amber-200/10 disabled:bg-stone-900/60 disabled:text-amber-100/50"
                 >
                   {printStatus === "loading"
                     ? "PDF wird erstellt..."
                     : "PDF herunterladen"}
                 </button>
                 {printStatus === "error" && printError && (
-                  <p className="text-sm text-rose-700">{printError}</p>
+                  <p className="text-sm text-rose-200">{printError}</p>
                 )}
               </div>
             </article>
 
             <div className="flex flex-col gap-4">
-              <article className="rounded-xl border border-stone-300 bg-white p-4 md:p-5">
-                <h3 className="text-lg font-semibold text-stone-800">
-                  Richtpreis (grob)
+              <article
+                className="relative overflow-hidden rounded-xl border border-amber-200/20 bg-stone-950/30 bg-center bg-cover bg-blend-multiply p-4 text-amber-50 shadow-[0_18px_45px_rgba(0,0,0,0.35)] md:p-5"
+                style={{ backgroundImage: "url('/plywood_diff_1k_darkened.jpg')" }}
+              >
+                <h3 className="text-lg font-semibold text-amber-100">
+                  Laserauftrag
                 </h3>
-                <div className="mt-3 text-sm text-stone-700">
-                  <div>Flaeche gesamt: {roughAreaM2.toFixed(3)} m2</div>
-                  <div className="mt-1 text-base font-semibold text-stone-900">
-                    {priceFormatter.format(roughPriceEur)}
+                <div className="mt-4 grid gap-4">
+                  <div className="rounded-lg border border-amber-200/20 bg-stone-900/70 p-3">
+                    <h4 className="text-sm font-semibold text-amber-100">
+                      Objekte &amp; Lasertest
+                    </h4>
+                    <div className="mt-2 grid gap-3 text-sm text-amber-100/80">
+                      <div className="grid grid-cols-4 gap-3">
+                        <div className="text-sm text-amber-50">
+                          <span className="text-xs uppercase tracking-wide text-amber-100/60">
+                            Text
+                          </span>
+                          : {widthCm.toFixed(1)} x {heightCm.toFixed(1)} cm
+                        </div>
+                        <div className="text-sm text-amber-50">
+                          <span className="text-xs uppercase tracking-wide text-amber-100/60">
+                            Herz
+                          </span>
+                          :{" "}
+                          {hasHeart
+                            ? `${heartWidthCm.toFixed(1)} x ${heartHeightCm.toFixed(1)} cm`
+                            : "deaktiviert"}
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-amber-50">
+                          <span className="text-xs uppercase tracking-wide text-amber-100/60">
+                            Linienabstand
+                          </span>
+                          {laserSafety ? (
+                            laserSafety.isSafe ? (
+                              successIcon
+                            ) : (
+                              <span className="text-rose-200">
+                                nicht bestanden
+                              </span>
+                            )
+                          ) : (
+                            <span className="text-amber-200">nicht getestet</span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-amber-50">
+                          <span className="text-xs uppercase tracking-wide text-amber-100/60">
+                            Text im Herz
+                          </span>
+                          {!hasHeart ? (
+                            <span className="text-amber-100/60">-</span>
+                          ) : textFitResult ? (
+                              textFitResult.result.isSafe ? (
+                                successIcon
+                              ) : (
+                                <span className="text-rose-200">
+                                  nicht bestanden
+                                </span>
+                              )
+                            ) : (
+                              <span className="text-amber-200">nicht getestet</span>
+                            )}
+                        </div>
+                      </div>
+                      <div className="pt-1 text-amber-100/70">
+                        Flaeche gesamt: {roughAreaM2.toFixed(3)} m2
+                      </div>
+                      <div className="text-base font-semibold text-amber-50">
+                        {priceFormatter.format(roughPriceEur)}
+                      </div>
+                    </div>
+                    {!hasRunLaserTest && (
+                      <div className="mt-3 rounded border border-amber-200/30 bg-amber-100/15 px-3 py-2 text-xs text-amber-100">
+                        Bitte Lasertest ausfuehren, um die Anfrage freizuschalten.
+                      </div>
+                    )}
+                    <button
+                      type="button"
+                      onClick={handleRunLaserTest}
+                      disabled={!canRunLaserTest}
+                      className="mt-3 rounded border border-amber-200/30 bg-amber-100/15 px-3 py-2 text-xs font-medium text-amber-50 transition hover:bg-amber-100/25 disabled:cursor-not-allowed disabled:border-amber-200/10 disabled:bg-stone-900/60 disabled:text-amber-100/50"
+                    >
+                      Lasertest ausfuehren
+                    </button>
+                  </div>
+
+                  <div className="rounded-lg border border-amber-200/20 bg-stone-900/70 p-3">
+                    <h4 className="text-sm font-semibold text-amber-100">
+                      Kontakt
+                    </h4>
+                    <form className="mt-3 grid gap-3 text-amber-100/80">
+                      <label className="grid gap-1 text-sm">
+                        Vollstaendiger Name
+                        <input
+                          type="text"
+                          placeholder="Max Mustermann"
+                          className="rounded border border-amber-200/25 bg-stone-900/80 px-3 py-2 text-amber-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
+                          value={contactName}
+                          onChange={(e) => setContactName(e.target.value)}
+                        />
+                      </label>
+                      <label className="grid gap-1 text-sm">
+                        E-Mail
+                        <input
+                          type="email"
+                          placeholder="name@beispiel.de"
+                          className="rounded border border-amber-200/25 bg-stone-900/80 px-3 py-2 text-amber-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
+                          value={contactEmail}
+                          onChange={(e) => setContactEmail(e.target.value)}
+                        />
+                      </label>
+                      <label className="grid gap-1 text-sm">
+                        Telefonnummer (optional)
+                        <input
+                          type="tel"
+                          placeholder="+49 ..."
+                          className="rounded border border-amber-200/25 bg-stone-900/80 px-3 py-2 text-amber-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
+                          value={contactPhone}
+                          onChange={(e) => setContactPhone(e.target.value)}
+                        />
+                      </label>
+                      <label className="grid gap-1 text-sm">
+                        Nachricht
+                        <textarea
+                          rows={3}
+                          placeholder="Hinweise zum Design oder Wunschlieferzeit"
+                          className="rounded border border-amber-200/25 bg-stone-900/80 px-3 py-2 text-amber-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
+                          value={contactMessage}
+                          onChange={(e) => setContactMessage(e.target.value)}
+                        />
+                      </label>
+                      <p className="text-xs leading-5 text-amber-100/70">
+                        Mit dem Absenden des Formulars erklaeren Sie sich damit
+                        einverstanden, dass Ihre Angaben zur Bearbeitung Ihrer Anfrage
+                        verarbeitet werden. Weitere Informationen finden Sie in unserer
+                        Datenschutzerklaerung.
+                      </p>
+                      <p className="text-xs leading-5 text-amber-100/70">
+                        Die ueber den Konfigurator uebermittelten Anfragen stellen kein
+                        verbindliches Angebot dar.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={handleSendRequest}
+                        disabled={!canSubmitRequest}
+                        className="mt-2 rounded bg-amber-200/20 px-4 py-2 text-sm font-medium text-amber-50 transition hover:bg-amber-200/30 disabled:cursor-not-allowed disabled:bg-stone-900/60 disabled:text-amber-100/50"
+                      >
+                        {requestStatus === "sending"
+                          ? "Wird gesendet..."
+                          : "Auftragsanfrage abschicken"}
+                      </button>
+                      {!hasRunLaserTest && (
+                        <p className="text-xs text-amber-200">
+                          Lasertest erforderlich, bevor Sie die Anfrage absenden koennen.
+                        </p>
+                      )}
+                      {requestStatus === "success" && (
+                        <p className="text-sm text-emerald-200">
+                          Anfrage wurde gesendet. Danke!
+                        </p>
+                      )}
+                      {requestStatus === "error" && requestError && (
+                        <p className="text-sm text-rose-200">{requestError}</p>
+                      )}
+                    </form>
                   </div>
                 </div>
-              </article>
-
-              <article className="rounded-xl border border-stone-300 bg-white p-4 md:p-5">
-                <h3 className="text-lg font-semibold text-stone-800">Kontakt</h3>
-                <form className="mt-4 grid gap-3">
-                <label className="grid gap-1 text-sm text-stone-700">
-                  Vollstaendiger Name
-                  <input
-                    type="text"
-                    placeholder="Max Mustermann"
-                    className="rounded border border-stone-300 px-3 py-2"
-                    value={contactName}
-                    onChange={(e) => setContactName(e.target.value)}
-                  />
-                </label>
-                <label className="grid gap-1 text-sm text-stone-700">
-                  E-Mail
-                  <input
-                    type="email"
-                    placeholder="name@beispiel.de"
-                    className="rounded border border-stone-300 px-3 py-2"
-                    value={contactEmail}
-                    onChange={(e) => setContactEmail(e.target.value)}
-                  />
-                </label>
-                <label className="grid gap-1 text-sm text-stone-700">
-                  Telefonnummer (optional)
-                  <input
-                    type="tel"
-                    placeholder="+49 ..."
-                    className="rounded border border-stone-300 px-3 py-2"
-                    value={contactPhone}
-                    onChange={(e) => setContactPhone(e.target.value)}
-                  />
-                </label>
-                <label className="grid gap-1 text-sm text-stone-700">
-                  Nachricht
-                  <textarea
-                    rows={3}
-                    placeholder="Hinweise zum Design oder Wunschlieferzeit"
-                    className="rounded border border-stone-300 px-3 py-2"
-                    value={contactMessage}
-                    onChange={(e) => setContactMessage(e.target.value)}
-                  />
-                </label>
-                <p className="text-xs leading-5 text-stone-600">
-                  Mit dem Absenden des Formulars erklaeren Sie sich damit
-                  einverstanden, dass Ihre Angaben zur Bearbeitung Ihrer Anfrage
-                  verarbeitet werden. Weitere Informationen finden Sie in unserer
-                  Datenschutzerklaerung.
-                </p>
-                <p className="text-xs leading-5 text-stone-600">
-                  Die ueber den Konfigurator uebermittelten Anfragen stellen kein
-                  verbindliches Angebot dar.
-                </p>
-                <button
-                  type="button"
-                  onClick={handleSendRequest}
-                  disabled={requestStatus === "sending"}
-                  className="mt-2 rounded bg-stone-900 px-4 py-2 text-sm font-medium text-white hover:bg-stone-800 disabled:cursor-not-allowed disabled:bg-stone-500"
-                >
-                  {requestStatus === "sending"
-                    ? "Wird gesendet..."
-                    : "Auftragsanfrage abschicken"}
-                </button>
-                {requestStatus === "success" && (
-                  <p className="text-sm text-emerald-700">
-                    Anfrage wurde gesendet. Danke!
-                  </p>
-                )}
-                {requestStatus === "error" && requestError && (
-                  <p className="text-sm text-rose-700">{requestError}</p>
-                )}
-                </form>
               </article>
             </div>
           </div>
