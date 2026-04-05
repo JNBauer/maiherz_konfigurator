@@ -17,7 +17,7 @@ const DEBUG_UNLOCK_CONTROLS = false
 // Fine-tune camera behavior here.
 const CAMERA_SETTINGS = {
   minDistance: DEBUG_UNLOCK_CONTROLS ? 0.05 : 0.5,
-  maxDistance: DEBUG_UNLOCK_CONTROLS ? 100 : 1.0,
+  maxDistance: DEBUG_UNLOCK_CONTROLS ? 100 : 1.4,
   minPolarAngle: DEBUG_UNLOCK_CONTROLS
     ? 0
     : THREE.MathUtils.degToRad(-10),
@@ -38,7 +38,7 @@ const CAMERA_SETTINGS = {
 const TARGET_OFFSET: [number, number, number] = [0.0, 0, 0]
 const INITIAL_AZIMUTH = 0
 const INITIAL_POLAR = 0.0001
-const INITIAL_DISTANCE = 1.2
+const INITIAL_DISTANCE = 0.8
 
 export type CameraDebugState = {
   pos: [number, number, number]
@@ -54,7 +54,7 @@ export default function SceneCamera({
   targetPosition,
   onDebugChange,
 }: SceneCameraProps) {
-  const { camera } = useThree()
+  const { camera, size } = useThree()
   const controlsRef = useRef<OrbitControlsImpl | null>(null)
   const didSetInitialAngles = useRef(false)
 
@@ -116,6 +116,12 @@ export default function SceneCamera({
     updateDebugState()
   }, [updateDebugState])
 
+  const maxDistance = DEBUG_UNLOCK_CONTROLS
+    ? 100
+    : size.width < 768
+      ? 1.4
+      : 1.0
+
   return (
     <OrbitControls
       ref={controlsRef}
@@ -124,7 +130,7 @@ export default function SceneCamera({
       enablePan={CAMERA_SETTINGS.enablePan}
       dampingFactor={CAMERA_SETTINGS.dampingFactor}
       minDistance={CAMERA_SETTINGS.minDistance}
-      maxDistance={CAMERA_SETTINGS.maxDistance}
+      maxDistance={maxDistance}
       minPolarAngle={CAMERA_SETTINGS.minPolarAngle}
       maxPolarAngle={CAMERA_SETTINGS.maxPolarAngle}
       minAzimuthAngle={CAMERA_SETTINGS.minAzimuthAngle}

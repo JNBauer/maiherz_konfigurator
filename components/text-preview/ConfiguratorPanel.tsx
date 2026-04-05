@@ -5,7 +5,6 @@ import { useEffect, useMemo, useRef, useState } from "react"
 
 import {
   MIN_LASER_CUT_LINE_DISTANCE_MM,
-  THICKNESS_OPTIONS_MM,
   sanitizeNameInput,
   toTitleCase,
   type FontOption,
@@ -13,6 +12,7 @@ import {
   type TextHeartContainmentResult,
   type MaterialKey,
   type TextMaterialKey,
+  type ThicknessMm,
 } from "./helpers"
 
 const borel = localFont({
@@ -84,11 +84,12 @@ type ConfiguratorPanelProps = {
   onTextMaterialChange: (value: TextMaterialKey) => void
   heartMaterial: MaterialKey
   onHeartMaterialChange: (value: MaterialKey) => void
-  thicknessOptions: number[]
-  textThicknessMm: (typeof THICKNESS_OPTIONS_MM)[number]
-  onTextThicknessChange: (value: (typeof THICKNESS_OPTIONS_MM)[number]) => void
-  heartThicknessMm: (typeof THICKNESS_OPTIONS_MM)[number]
-  onHeartThicknessChange: (value: (typeof THICKNESS_OPTIONS_MM)[number]) => void
+  textThicknessOptions: readonly ThicknessMm[]
+  textThicknessMm: ThicknessMm
+  onTextThicknessChange: (value: ThicknessMm) => void
+  heartThicknessOptions: readonly ThicknessMm[]
+  heartThicknessMm: ThicknessMm
+  onHeartThicknessChange: (value: ThicknessMm) => void
   spacing: number
   onSpacingChange: (value: number) => void
   textOffsetYcm: number
@@ -147,9 +148,10 @@ export default function ConfiguratorPanel({
   onTextMaterialChange,
   heartMaterial,
   onHeartMaterialChange,
-  thicknessOptions,
+  textThicknessOptions,
   textThicknessMm,
   onTextThicknessChange,
+  heartThicknessOptions,
   heartThicknessMm,
   onHeartThicknessChange,
   spacing,
@@ -370,7 +372,7 @@ export default function ConfiguratorPanel({
         <div className={`mt-3 flex flex-col gap-1 text-sm ${engravingMode ? "opacity-60" : ""}`}>
           Dicke ({textThicknessMm} mm)
           <div className="flex flex-wrap gap-2">
-            {thicknessOptions.map((option) => {
+            {textThicknessOptions.map((option) => {
               const active = textThicknessMm === option
               return (
                 <button
@@ -378,7 +380,7 @@ export default function ConfiguratorPanel({
                   type="button"
                   onClick={() =>
                     onTextThicknessChange(
-                      option as (typeof THICKNESS_OPTIONS_MM)[number]
+                      option as ThicknessMm
                     )
                   }
                   disabled={engravingMode}
@@ -555,7 +557,7 @@ export default function ConfiguratorPanel({
         <div className={`mt-3 flex flex-col gap-1 text-sm ${includeHeart ? "" : "opacity-60"}`}>
           Materialdicke ({heartThicknessMm} mm)
           <div className="flex flex-wrap gap-2">
-            {thicknessOptions.map((option) => {
+            {heartThicknessOptions.map((option) => {
               const active = heartThicknessMm === option
               return (
                 <button
@@ -563,7 +565,7 @@ export default function ConfiguratorPanel({
                   type="button"
                   onClick={() =>
                     onHeartThicknessChange(
-                      option as (typeof THICKNESS_OPTIONS_MM)[number]
+                      option as ThicknessMm
                     )
                   }
                   disabled={!includeHeart}
@@ -630,12 +632,12 @@ export default function ConfiguratorPanel({
   )
 
   return (
-    <div className="pointer-events-none absolute inset-0 z-20 flex items-center px-6">
-      <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div className="w-full max-w-[22rem] lg:w-[clamp(17rem,28vw,22rem)]">
+    <div className="pointer-events-none relative z-20 mt-4 flex w-full flex-col gap-4 md:absolute md:inset-0 md:mt-0 md:items-center md:px-6">
+      <div className="flex w-full flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div className="w-full md:max-w-[22rem] md:w-[clamp(17rem,28vw,22rem)]">
           <div className="pointer-events-auto">{heartSection}</div>
         </div>
-        <div className="flex w-full max-w-[22rem] flex-col gap-4 lg:w-[clamp(17rem,28vw,22rem)]">
+        <div className="flex w-full flex-col gap-4 md:max-w-[22rem] md:w-[clamp(17rem,28vw,22rem)]">
           <div className="pointer-events-auto">{textSection}</div>
           <div className="pointer-events-auto">{laserSection}</div>
         </div>

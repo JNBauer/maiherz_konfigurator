@@ -1,4 +1,11 @@
+import type { Metadata } from "next"
 import HeroHeader from "@/components/HeroHeader"
+
+export const metadata: Metadata = {
+  title: "Danksagungen",
+  description:
+    "Quellen, Lizenzen und Danksagungen für verwendete Schriftarten, Texturen und 3D-Assets.",
+}
 
 export default function AcknowledgmentPage() {
   return (

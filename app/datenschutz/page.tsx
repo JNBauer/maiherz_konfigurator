@@ -1,4 +1,12 @@
-﻿export default function PrivacyPolicyPage() {
+﻿import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Datenschutzerklärung",
+  description:
+    "Informationen zur Verarbeitung personenbezogener Daten und zum Datenschutz bei mai-herz.de.",
+}
+
+export default function PrivacyPolicyPage() {
   return (
     <section className="mx-auto w-[90%] max-w-4xl py-10 text-stone-900">
       <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">

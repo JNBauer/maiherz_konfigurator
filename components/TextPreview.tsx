@@ -11,16 +11,18 @@ import TextPreviewScene from "./text-preview/TextPreviewScene"
 import TextPreviewPanels from "./text-preview/TextPreviewPanels"
 import {
   MATERIAL_OPTIONS,
+  MATERIAL_THICKNESS_OPTIONS_MM,
+  MATERIAL_THICKNESS_PRICE_EUR_PER_M2,
   buildLayout,
   evaluateLaserCutSafety,
   evaluateTextWithinHeartMargin,
   type TextHeartContainmentResult,
   WIDTH_CM_TO_SCENE_SIZE,
-  THICKNESS_OPTIONS_MM,
   type AnchorTransform,
   type FontOption,
   type LaserSafetyResult,
   type MaterialKey,
+  type ThicknessMm,
   type TextMaterialKey,
 } from "./text-preview/helpers"
 
@@ -32,7 +34,8 @@ const MIN_HEART_WIDTH_CM = 10
 const MAX_HEART_WIDTH_CM = 70
 const MIN_HEART_HEIGHT_CM = 10
 const MAX_HEART_HEIGHT_CM = 50
-const PRICE_PER_M2_EUR = 40
+const FALLBACK_PRICE_PER_M2_EUR = 40
+const BASE_PRICE_EUR = 7
 const HEART_TEXT_MARGIN_MM = 10
 const LASER_TEST_THRESHOLD_MM = 4
 const ENGRAVE_DEPTH_MM = 0.3
@@ -51,12 +54,8 @@ export default function TextPreview() {
   const [heartMaterial, setHeartMaterial] = useState<MaterialKey>("mdf")
   const [heartVariant, setHeartVariant] = useState(HEART_VARIANTS[0])
   const [heartSvg, setHeartSvg] = useState<string | null>(null)
-  const [textThicknessMm, setTextThicknessMm] = useState<
-    (typeof THICKNESS_OPTIONS_MM)[number]
-  >(5)
-  const [heartThicknessMm, setHeartThicknessMm] = useState<
-    (typeof THICKNESS_OPTIONS_MM)[number]
-  >(5)
+  const [textThicknessMm, setTextThicknessMm] = useState<ThicknessMm>(5)
+  const [heartThicknessMm, setHeartThicknessMm] = useState<ThicknessMm>(5)
   const [spacing, setSpacing] = useState(0.02)
   const [textOffsetYcm, setTextOffsetYcm] = useState(2)
   const [activeTab, setActiveTab] =
@@ -185,27 +184,60 @@ export default function TextPreview() {
     )
   }, [borderUnit, heartDepth, textBorders])
 
+  const textAreaCm2 = useMemo(() => {
+    return hasText && !isEngraved ? widthCm * heightCm : 0
+  }, [hasText, heightCm, isEngraved, widthCm])
+
+  const heartAreaCm2 = useMemo(() => {
+    return hasHeart ? heartWidthCm * heartHeightCm : 0
+  }, [hasHeart, heartHeightCm, heartWidthCm])
+
   const roughAreaCm2 = useMemo(() => {
-    const textArea = hasText && !isEngraved ? widthCm * heightCm : 0
-    const heartArea = hasHeart ? heartWidthCm * heartHeightCm : 0
-    return textArea + heartArea
-  }, [
-    hasHeart,
-    hasText,
-    heartHeightCm,
-    heartWidthCm,
-    heightCm,
-    isEngraved,
-    widthCm,
-  ])
+    return textAreaCm2 + heartAreaCm2
+  }, [heartAreaCm2, textAreaCm2])
 
   const roughAreaM2 = useMemo(() => {
     return roughAreaCm2 / 10000
   }, [roughAreaCm2])
 
+  const textPricePerM2 = useMemo(() => {
+    if (textMaterial === "engraving") return 0
+    return (
+      MATERIAL_THICKNESS_PRICE_EUR_PER_M2[textMaterial]?.[textThicknessMm] ??
+      FALLBACK_PRICE_PER_M2_EUR
+    )
+  }, [textMaterial, textThicknessMm])
+
+  const heartPricePerM2 = useMemo(() => {
+    return (
+      MATERIAL_THICKNESS_PRICE_EUR_PER_M2[heartMaterial]?.[heartThicknessMm] ??
+      FALLBACK_PRICE_PER_M2_EUR
+    )
+  }, [heartMaterial, heartThicknessMm])
+
   const roughPriceEur = useMemo(() => {
-    return roughAreaM2 * PRICE_PER_M2_EUR
-  }, [roughAreaM2])
+    const textAreaM2 = textAreaCm2 / 10000
+    const heartAreaM2 = heartAreaCm2 / 10000
+    const textRuestFactor =
+      textMaterial !== "engraving" &&
+      (textMaterial === "mdf" || textMaterial === "multiplex")
+        ? 1.3
+        : 1
+    const heartRuestFactor =
+      heartMaterial === "mdf" || heartMaterial === "multiplex" ? 1.3 : 1
+    const subtotal =
+      textAreaM2 * textPricePerM2 * textRuestFactor +
+      heartAreaM2 * heartPricePerM2 * heartRuestFactor +
+      BASE_PRICE_EUR
+    return Math.ceil(subtotal * 2) / 2
+  }, [
+    heartAreaCm2,
+    heartMaterial,
+    heartPricePerM2,
+    textAreaCm2,
+    textMaterial,
+    textPricePerM2,
+  ])
 
   const priceFormatter = useMemo(() => {
     return new Intl.NumberFormat("de-DE", {
@@ -243,9 +275,15 @@ export default function TextPreview() {
     []
   )
 
-  const thicknessOptions = useMemo(() => {
-    return [...THICKNESS_OPTIONS_MM]
-  }, [])
+  const textThicknessOptions = useMemo(() => {
+    const materialKey =
+      textMaterial === "engraving" ? "mdf" : (textMaterial as MaterialKey)
+    return MATERIAL_THICKNESS_OPTIONS_MM[materialKey]
+  }, [textMaterial])
+
+  const heartThicknessOptions = useMemo(() => {
+    return MATERIAL_THICKNESS_OPTIONS_MM[heartMaterial]
+  }, [heartMaterial])
 
   function clampTextHeightCm(next: number) {
     return Math.min(maxTextHeightCm, Math.max(minTextHeightCm, next))
@@ -452,14 +490,18 @@ export default function TextPreview() {
   }, [heartMaterial, heartMaterialOptions])
 
   useEffect(() => {
-    if (thicknessOptions.length === 0) return
-    if (!thicknessOptions.includes(textThicknessMm)) {
-      setTextThicknessMm(thicknessOptions[0])
+    if (textThicknessOptions.length === 0) return
+    if (!textThicknessOptions.includes(textThicknessMm)) {
+      setTextThicknessMm(textThicknessOptions[0])
     }
-    if (!thicknessOptions.includes(heartThicknessMm)) {
-      setHeartThicknessMm(thicknessOptions[0])
+  }, [textThicknessMm, textThicknessOptions])
+
+  useEffect(() => {
+    if (heartThicknessOptions.length === 0) return
+    if (!heartThicknessOptions.includes(heartThicknessMm)) {
+      setHeartThicknessMm(heartThicknessOptions[0])
     }
-  }, [heartThicknessMm, textThicknessMm, thicknessOptions])
+  }, [heartThicknessMm, heartThicknessOptions])
 
   function handleLetterLevel(obj: THREE.Object3D) {
     obj.updateWorldMatrix(true, true)
@@ -624,7 +666,8 @@ export default function TextPreview() {
             onTextMaterialChange: setTextMaterial,
             heartMaterial,
             onHeartMaterialChange: setHeartMaterial,
-            thicknessOptions,
+            textThicknessOptions,
+            heartThicknessOptions,
             textThicknessMm,
             onTextThicknessChange: setTextThicknessMm,
             heartThicknessMm,

@@ -1,4 +1,11 @@
+import type { Metadata } from "next"
 import HeroHeader from "@/components/HeroHeader"
+
+export const metadata: Metadata = {
+  title: "Über mich",
+  description:
+    "Erfahre mehr über Julian Bauer und die Idee hinter den personalisierten Maiherzen.",
+}
 
 export default function UeberMichPage() {
   return (
@@ -11,22 +18,20 @@ export default function UeberMichPage() {
 
             <div className="mt-6 space-y-5 text-base leading-7 text-stone-800">
               <p>
-                Ich mag die Tradition der Maiherzen total, vor allem auch das
-                Handwerk dahinter. Man kann dabei immer ein Stück Persönlichkeit
-                mit einbringen.
+                Ich mag die Tradition der Maiherzen, vor allem das Handwerk
+                und die Möglichkeit, etwas Eigenes zu gestalten.
               </p>
 
               <p>
                 Am besten ist es natürlich, wenn jede und jeder sein Herz
-                selbst aussägt und gestaltet. Aber ich weiß auch, dass dafür
+                selbst aussägt und gestaltet. Aber ich weiß, dass dafür
                 nicht immer Zeit bleibt.
               </p>
 
               <p>
-                Deshalb biete ich an, individuell gestaltete Herzen für dich
-                auszusägen, sodass du sie anschließend nur noch selbst bemalen
-                musst. So bleibt es persönlich, aber ein Teil der Arbeit ist
-                schon erledigt.
+                Deshalb bereite ich individuell gestaltete Herzen mit dem Lasercutter
+                für dich vor, die du dann nur noch selbst bemalen musst. So
+                bleibt es persönlich, aber ein Teil der Arbeit ist schon erledigt.
               </p>
 
               <p>

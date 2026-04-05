@@ -226,6 +226,9 @@ export default function TextPreviewPanels({
                   <div className="text-lg font-semibold text-amber-50">
                     {priceFormatter.format(roughPriceEur)}
                   </div>
+                  <p className="text-sm text-amber-100/70">
+                    Zzgl. ggf. anfallender Versandkosten.
+                  </p>
                 </div>
                 {!hasRunLaserTest && (
                   <div className="mt-3 rounded border border-amber-200/30 bg-amber-100/15 px-3 py-2 text-sm text-amber-100">

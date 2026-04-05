@@ -12,7 +12,7 @@ export const MATERIAL_OPTIONS = [
   { key: "acryl", label: "Acryl" },
 ] as const
 
-export const THICKNESS_OPTIONS_MM = [3, 5, 8] as const
+export const THICKNESS_OPTIONS_MM = [3, 4, 5, 9, 10] as const
 
 export type LayoutLetter = {
   char: string
@@ -26,6 +26,34 @@ export type FontOption = {
 
 export type MaterialKey = (typeof MATERIAL_OPTIONS)[number]["key"]
 export type TextMaterialKey = MaterialKey | "engraving"
+export type ThicknessMm = (typeof THICKNESS_OPTIONS_MM)[number]
+
+export const MATERIAL_THICKNESS_OPTIONS_MM: Record<
+  MaterialKey,
+  readonly ThicknessMm[]
+> = {
+  mdf: [3, 5, 10],
+  multiplex: [4, 9],
+  acryl: [5],
+} as const
+
+export const MATERIAL_THICKNESS_PRICE_EUR_PER_M2: Record<
+  MaterialKey,
+  Partial<Record<ThicknessMm, number>>
+> = {
+  mdf: {
+    3: 10,
+    5: 10,
+    10: 17,
+  },
+  multiplex: {
+    4: 40,
+    9: 50,
+  },
+  acryl: {
+    5: 40,
+  },
+} as const
 
 export type WorkshopMaterialSheet = {
   id: string

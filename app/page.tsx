@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import Image from "next/image"
 import HeroHeader from "../components/HeroHeader"
 import TextPreview from "../components/TextPreview"
 
@@ -30,6 +31,61 @@ export default function Home() {
       name: "mai-herz.de",
     },
     category: "Handmade Decor",
+  }
+
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "Wie genau ist die 3D-Vorschau?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Die Vorschau zeigt Proportionen, Abstände und die Wirkung des Textes im Herz. Für exakte Maße nutze die angezeigten Zentimeterwerte und die PDF-Schablone.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "Kann ich eigene Schriftarten nutzen?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Wähle aus den verfügbaren Schriften im Konfigurator. Wenn du eine spezielle Schrift brauchst, vermerke den Wunsch in der Anfrage.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "Was passiert nach dem Absenden?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Wir prüfen die Angaben, melden uns bei Rückfragen und bestätigen die Umsetzung. Danach vereinbaren wir den nächsten Schritt.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "Ist der Lasertest verpflichtend?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Ja, der Lasertest stellt sicher, dass dein Text stabil bleibt. Erst danach kann die Anfrage abgeschickt werden.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "Kann ich mehrere Größen ausprobieren?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Ja, ändere Höhe, Breite und Abstand, bis die Vorschau und die Abstände passen. Die grobe Fläche hilft dir bei der Einschätzung.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "Welche Materialien stehen zur Wahl?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Du kannst zwischen MDF, Multiplex und Acryl wählen. Je nach Material wirken Kanten, Farbe und Lichtdurchlass unterschiedlich.",
+        },
+      },
+    ],
   }
 
   return (
@@ -94,13 +150,15 @@ export default function Home() {
       <section className="w-full px-3 pb-10 pt-8 md:px-6 md:pt-10">
         <div className="mx-auto grid w-[90%] gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
           <figure
-            className="relative overflow-hidden rounded-xl border border-amber-200/20 bg-stone-950/30 bg-center bg-cover bg-blend-multiply shadow-[0_18px_45px_rgba(0,0,0,0.35)]"
+            className="relative min-h-[320px] overflow-hidden rounded-xl border border-amber-200/20 bg-stone-950/30 bg-center bg-cover bg-blend-multiply shadow-[0_18px_45px_rgba(0,0,0,0.35)] md:min-h-[380px]"
             style={{ backgroundImage: "url('/plywood_diff_1k_darkened.jpg')" }}
           >
-            <img
+            <Image
               src="/maiherz-scene.png"
               alt="3D Vorschau eines personalisierten Maiherzens"
-              className="h-full w-full object-cover"
+              fill
+              sizes="(max-width: 1024px) 90vw, 45vw"
+              className="object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-stone-950/85 via-stone-950/10 to-transparent" />
             <figcaption className="relative px-4 py-3 text-sm text-amber-100/80">
@@ -281,6 +339,10 @@ export default function Home() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
     </div>
   )

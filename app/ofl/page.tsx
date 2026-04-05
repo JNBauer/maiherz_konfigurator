@@ -1,4 +1,10 @@
+import type { Metadata } from "next"
 import HeroHeader from "@/components/HeroHeader"
+
+export const metadata: Metadata = {
+  title: "SIL Open Font License 1.1",
+  description: "Vollständiger Lizenztext der SIL Open Font License 1.1.",
+}
 
 export default function OflPage() {
   return (

@@ -26,9 +26,9 @@ V02
 - [X] Separate TEXT and HERZ into two windows, one on the right, the other one left
 - [ ] Lazy-load the 3D scene for better SEO
 - [ ] Nicer loading screen (changing heart, name combinations)
-- [ ] Proper font acknowledgment
-- [ ] Add a nice blurry background image
-- [ ] Improve SEO
-- [ ] Fix the Impressum, Datenschutz buttons
-- [ ] Add text explaining the Download & Print
-- [ ] Add umami.js
+- [X] Proper font acknowledgment
+- [X] Add a nice blurry background image
+- [X] Improve SEO
+- [X] Fix the Impressum, Datenschutz buttons
+- [X] Add text explaining the Download & Print
+- [X] Add umami.js

@@ -1,4 +1,11 @@
-﻿export default function ImpressumPage() {
+﻿import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Impressum",
+  description: "Rechtliche Angaben und Kontaktinformationen zu mai-herz.de.",
+}
+
+export default function ImpressumPage() {
   return (
     <section className="mx-auto w-[90%] max-w-4xl py-10 text-stone-900">
       <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm">
@@ -27,7 +34,7 @@
               </a><br />
               Telefon:{" "}
               <a href="tel:+49123456789" className="underline">
-                +49 123 456789
+                +49 1575 6866042
               </a>
             </p>
           </div>

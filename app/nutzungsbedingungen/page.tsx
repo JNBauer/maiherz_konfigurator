@@ -1,4 +1,10 @@
+import type { Metadata } from "next"
 import HeroHeader from "@/components/HeroHeader"
+
+export const metadata: Metadata = {
+  title: "Nutzungsbedingungen",
+  description: "Nutzungsbedingungen für den Maiherz-Konfigurator.",
+}
 
 export default function TermsOfUsePage() {
   return (
