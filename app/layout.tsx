@@ -4,7 +4,7 @@ import SiteFooter from "@/components/SiteFooter"
 import "./globals.css"
 
 const geistSans = localFont({
-  src: "../public/fonts/JosefinSans-VariableFont_wght.ttf",
+  src: "../public/fonts/Borel-Regular.ttf",
   variable: "--font-geist-sans",
   display: "swap",
 })

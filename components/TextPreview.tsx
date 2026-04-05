@@ -1,6 +1,6 @@
 "use client"
 
-import { Canvas } from "@react-three/fiber"
+import { Canvas, useThree } from "@react-three/fiber"
 import { GizmoHelper, GizmoViewport } from "@react-three/drei"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js"
@@ -94,6 +94,8 @@ export default function TextPreview() {
     "idle" | "loading" | "error"
   >("idle")
   const [printError, setPrintError] = useState<string | null>(null)
+  const [canScreenshot, setCanScreenshot] = useState(false)
+  const screenshotHandlerRef = useRef<null | (() => Promise<Blob | null>)>(null)
   const [laserSafetyCheck, setLaserSafetyCheck] = useState<{
     key: string
     result: LaserSafetyResult
@@ -166,7 +168,10 @@ export default function TextPreview() {
   const textFitResult = textFitCheck?.key === textFitKey ? textFitCheck : null
   const hasRunLaserTest =
     Boolean(laserSafety) && (!hasHeart || Boolean(textFitResult))
-  const canSubmitRequest = hasRunLaserTest && requestStatus !== "sending"
+  const isLaserSafe = Boolean(laserSafety?.isSafe)
+  const isTextFitSafe = !hasHeart || Boolean(textFitResult?.result.isSafe)
+  const canSubmitRequest =
+    hasRunLaserTest && isLaserSafe && isTextFitSafe && requestStatus !== "sending"
   const successIcon = (
     <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
       <svg viewBox="0 0 20 20" aria-hidden="true" className="h-3 w-3">
@@ -422,6 +427,40 @@ export default function TextPreview() {
     }
   }
 
+  async function handleDownloadScreenshot() {
+    if (!screenshotHandlerRef.current) return
+    const blob = await screenshotHandlerRef.current()
+    if (!blob) return
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement("a")
+    link.href = url
+    link.download = "maiherz-scene.png"
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    URL.revokeObjectURL(url)
+  }
+
+  function ScreenshotBridge({
+    onReady,
+  }: {
+    onReady: (handler: () => Promise<Blob | null>) => void
+  }) {
+    const { gl } = useThree()
+
+    useEffect(() => {
+      const canvas = gl.domElement
+      const handler = async () => {
+        return await new Promise<Blob | null>((resolve) => {
+          canvas.toBlob((blob) => resolve(blob), "image/png")
+        })
+      }
+      onReady(handler)
+    }, [gl, onReady])
+
+    return null
+  }
+
   useEffect(() => {
     const availableMaterialKeys = materialOptions
       .filter((option) => option.available)
@@ -565,6 +604,7 @@ export default function TextPreview() {
           <Canvas
             shadows={{ type: THREE.PCFShadowMap }}
             camera={{ position: [0, 4, 14], fov: 45 }}
+            gl={{ preserveDrawingBuffer: true }}
           >
             <SceneLighting targetPosition={anchorTransform?.position ?? null} />
 
@@ -705,14 +745,26 @@ export default function TextPreview() {
               onDebugChange={setCameraDebug}
             />
 
-            {null}
+            <ScreenshotBridge
+              onReady={(handler) => {
+                screenshotHandlerRef.current = handler
+                setCanScreenshot(true)
+              }}
+            />
           </Canvas>
 
           {showSceneLoading && (
-            <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center bg-stone-200/75">
-              <div className="flex items-center gap-3 rounded-full border border-stone-300 bg-white/90 px-4 py-2 text-sm text-stone-700 shadow-sm">
-                <span className="h-4 w-4 animate-spin rounded-full border-2 border-stone-400 border-t-transparent" />
-                Lade 3D Szene...
+            <div className="pointer-events-none absolute inset-0 z-10 overflow-hidden">
+              <img
+                src="/maiherz-scene.png"
+                alt="3D Szene Vorschau"
+                className="h-full w-full object-cover"
+              />
+              <div className="absolute inset-0 flex items-center justify-center bg-stone-950/30">
+                <div className="flex items-center gap-3 rounded-full border border-stone-300/60 bg-stone-900/70 px-4 py-2 text-sm text-amber-50 shadow-sm">
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-amber-200 border-t-transparent" />
+                  Lade 3D Szene...
+                </div>
               </div>
             </div>
           )}
@@ -809,7 +861,7 @@ export default function TextPreview() {
                 <p className="text-xs leading-5 text-amber-100/70">
                   Das PDF ist massstabgetreu. Grosse Designs werden automatisch
                   auf mehrere Seiten verteilt und mit Ueberlappungen markiert,
-                  damit Sie sie einfach zusammenkleben koennen.
+                  damit du sie einfach zusammenkleben kannst.
                 </p>
                 <button
                   type="button"
@@ -820,6 +872,14 @@ export default function TextPreview() {
                   {printStatus === "loading"
                     ? "PDF wird erstellt..."
                     : "PDF herunterladen"}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDownloadScreenshot}
+                  disabled={!canScreenshot}
+                  className="rounded border border-amber-200/30 bg-amber-100/10 px-4 py-2 text-sm font-medium text-amber-50 transition hover:bg-amber-100/20 disabled:cursor-not-allowed disabled:border-amber-200/10 disabled:bg-stone-900/60 disabled:text-amber-100/50"
+                >
+                  Screenshot herunterladen
                 </button>
                 {printStatus === "error" && printError && (
                   <p className="text-sm text-rose-200">{printError}</p>
@@ -893,7 +953,7 @@ export default function TextPreview() {
                         </div>
                       </div>
                       <div className="pt-1 text-amber-100/70">
-                        Flaeche gesamt: {roughAreaM2.toFixed(3)} m2
+                        Fläche gesamt: {roughAreaM2.toFixed(3)} m2
                       </div>
                       <div className="text-base font-semibold text-amber-50">
                         {priceFormatter.format(roughPriceEur)}
@@ -901,7 +961,7 @@ export default function TextPreview() {
                     </div>
                     {!hasRunLaserTest && (
                       <div className="mt-3 rounded border border-amber-200/30 bg-amber-100/15 px-3 py-2 text-xs text-amber-100">
-                        Bitte Lasertest ausfuehren, um die Anfrage freizuschalten.
+                        Bitte Lasertest ausführen, um die Anfrage freizuschalten.
                       </div>
                     )}
                     <button
@@ -910,7 +970,7 @@ export default function TextPreview() {
                       disabled={!canRunLaserTest}
                       className="mt-3 rounded border border-amber-200/30 bg-amber-100/15 px-3 py-2 text-xs font-medium text-amber-50 transition hover:bg-amber-100/25 disabled:cursor-not-allowed disabled:border-amber-200/10 disabled:bg-stone-900/60 disabled:text-amber-100/50"
                     >
-                      Lasertest ausfuehren
+                      Lasertest ausführen
                     </button>
                   </div>
 
@@ -920,7 +980,7 @@ export default function TextPreview() {
                     </h4>
                     <form className="mt-3 grid gap-3 text-amber-100/80">
                       <label className="grid gap-1 text-sm">
-                        Vollstaendiger Name
+                        Vollständiger Name
                         <input
                           type="text"
                           placeholder="Max Mustermann"
@@ -960,13 +1020,13 @@ export default function TextPreview() {
                         />
                       </label>
                       <p className="text-xs leading-5 text-amber-100/70">
-                        Mit dem Absenden des Formulars erklaeren Sie sich damit
-                        einverstanden, dass Ihre Angaben zur Bearbeitung Ihrer Anfrage
-                        verarbeitet werden. Weitere Informationen finden Sie in unserer
-                        Datenschutzerklaerung.
+                        Mit dem Absenden des Formulars erklärst du dich damit
+                        einverstanden, dass deine Angaben zur Bearbeitung deiner Anfrage
+                        verarbeitet werden. Weitere Informationen findest du in unserer
+                        Datenschutzerklärung.
                       </p>
                       <p className="text-xs leading-5 text-amber-100/70">
-                        Die ueber den Konfigurator uebermittelten Anfragen stellen kein
+                        Die über den Konfigurator übermittelten Anfragen stellen kein
                         verbindliches Angebot dar.
                       </p>
                       <button
@@ -981,7 +1041,7 @@ export default function TextPreview() {
                       </button>
                       {!hasRunLaserTest && (
                         <p className="text-xs text-amber-200">
-                          Lasertest erforderlich, bevor Sie die Anfrage absenden koennen.
+                          Lasertest erforderlich, bevor du die Anfrage absenden kannst.
                         </p>
                       )}
                       {requestStatus === "success" && (

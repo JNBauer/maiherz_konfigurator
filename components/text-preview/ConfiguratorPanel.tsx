@@ -30,11 +30,6 @@ const dancingScript = localFont({
   variable: "--font-dancing",
   display: "swap",
 })
-const josefinSans = localFont({
-  src: "../../public/fonts/JosefinSans-VariableFont_wght.ttf",
-  variable: "--font-josefin",
-  display: "swap",
-})
 const lobster = localFont({
   src: "../../public/fonts/Lobster-Regular.ttf",
   variable: "--font-lobster",
@@ -113,7 +108,6 @@ function getFontPreviewClass(fontLabel: string) {
   if (normalized.includes("borel")) return borel.className
   if (normalized.includes("cherry bomb one")) return cherryBombOne.className
   if (normalized.includes("dancing script")) return dancingScript.className
-  if (normalized.includes("josefin sans")) return josefinSans.className
   if (normalized.includes("lobster")) return lobster.className
   if (normalized.includes("geist") || normalized.includes("mono")) {
     return geistMono.className
