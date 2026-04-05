@@ -26,7 +26,7 @@ export default function HeroHeader() {
                 href="/ueber-mich"
                 className="rounded-full bg-amber-900/60 px-5 py-2 text-center text-sm font-medium text-amber-50 transition hover:bg-amber-900/70"
               >
-                Ãœber mich
+                Über mich
               </a>
 
               <a
@@ -40,7 +40,7 @@ export default function HeroHeader() {
                 href="/acknowledgment"
                 className="rounded-full bg-amber-900/60 px-5 py-2 text-center text-sm font-medium text-amber-50 transition hover:bg-amber-900/70"
               >
-                Acknowledgments
+                Danksagungen
               </a>
             </div>
           </div>

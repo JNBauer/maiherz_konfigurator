@@ -1,19 +1,24 @@
 export default function SiteFooter() {
   return (
     <footer className="relative z-30 border-t border-stone-300 bg-stone-100">
-      <div className="mx-auto flex w-[90%] flex-col gap-3 py-4 text-sm text-stone-700 md:flex-row md:items-center md:justify-between">
-        <p>(c) {new Date().getFullYear()} Maiherz-Konfigurator</p>
+      <div className="mx-auto flex w-[90%] flex-col gap-3 py-5 text-sm text-stone-700 md:flex-row md:items-center md:justify-between">
+        
+        <p>
+          © {new Date().getFullYear()} Julian Bauer · mai-herz.de
+        </p>
+
         <nav className="flex flex-wrap items-center gap-x-4 gap-y-2">
           <a href="/impressum" className="hover:underline">
             Impressum
           </a>
-          <a href="/terms-of-use" className="hover:underline">
-            Terms of Use
+          <a href="/nutzungsbedingungen" className="hover:underline">
+            Nutzungsbedingungen
           </a>
-          <a href="/privacy-policy" className="hover:underline">
-            Privacy Policy
+          <a href="/datenschutz" className="hover:underline">
+            Datenschutz
           </a>
         </nav>
+
       </div>
     </footer>
   )

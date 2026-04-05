@@ -1,26 +1,19 @@
 "use client"
 
-import { Canvas, useThree } from "@react-three/fiber"
-import { GizmoHelper, GizmoViewport } from "@react-three/drei"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js"
 import type { Font } from "three/examples/jsm/loaders/FontLoader.js"
 import * as THREE from "three"
 
-import SceneCamera from "../components/SceneCamera"
 import type { CameraDebugState } from "../components/SceneCamera"
-import SceneLighting from "../components/SceneLighting"
-import WorkbenchScene from "../components/WorkbenchScene"
 import HeroHeader from "../components/HeroHeader"
-import ConfiguratorPanel from "./text-preview/ConfiguratorPanel"
-import PreviewHeart from "./text-preview/PreviewHeart"
-import PreviewLetters from "./text-preview/PreviewLetters"
+import TextPreviewScene from "./text-preview/TextPreviewScene"
+import TextPreviewPanels from "./text-preview/TextPreviewPanels"
 import {
   MATERIAL_OPTIONS,
   buildLayout,
   evaluateLaserCutSafety,
   evaluateTextWithinHeartMargin,
-  MIN_LASER_CUT_LINE_DISTANCE_MM,
   type TextHeartContainmentResult,
   WIDTH_CM_TO_SCENE_SIZE,
   THICKNESS_OPTIONS_MM,
@@ -79,7 +72,7 @@ export default function TextPreview() {
     null
   )
   const [isSceneReady, setIsSceneReady] = useState(false)
-  const [cameraDebug, setCameraDebug] = useState<CameraDebugState | null>(null)
+  const [, setCameraDebug] = useState<CameraDebugState | null>(null)
   const [contactName, setContactName] = useState("")
   const [contactEmail, setContactEmail] = useState("")
   const [contactPhone, setContactPhone] = useState("")
@@ -172,16 +165,6 @@ export default function TextPreview() {
   const isTextFitSafe = !hasHeart || Boolean(textFitResult?.result.isSafe)
   const canSubmitRequest =
     hasRunLaserTest && isLaserSafe && isTextFitSafe && requestStatus !== "sending"
-  const successIcon = (
-    <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
-      <svg viewBox="0 0 20 20" aria-hidden="true" className="h-3 w-3">
-        <path
-          fill="currentColor"
-          d="M7.6 13.2 4.7 10.3l1.4-1.4 1.5 1.5 6.1-6.1 1.4 1.4z"
-        />
-      </svg>
-    </span>
-  )
   const textFitMarkers = textFitResult?.result.debugPointsMm ?? []
   const heartBorder = textFitResult?.result.heartPolygonMm ?? []
   const textBorders = textFitResult?.result.textPolylinesMm ?? []
@@ -441,26 +424,6 @@ export default function TextPreview() {
     URL.revokeObjectURL(url)
   }
 
-  function ScreenshotBridge({
-    onReady,
-  }: {
-    onReady: (handler: () => Promise<Blob | null>) => void
-  }) {
-    const { gl } = useThree()
-
-    useEffect(() => {
-      const canvas = gl.domElement
-      const handler = async () => {
-        return await new Promise<Blob | null>((resolve) => {
-          canvas.toBlob((blob) => resolve(blob), "image/png")
-        })
-      }
-      onReady(handler)
-    }, [gl, onReady])
-
-    return null
-  }
-
   useEffect(() => {
     const availableMaterialKeys = materialOptions
       .filter((option) => option.available)
@@ -600,466 +563,122 @@ export default function TextPreview() {
       <HeroHeader />
 
       <main className="w-full px-3 pb-4 pt-5 md:px-6 md:pt-7">
-        <div className="relative mx-auto h-[82vh] min-h-[620px] w-[90%] overflow-hidden rounded-xl border border-stone-300 bg-stone-200">
-          <Canvas
-            shadows={{ type: THREE.PCFShadowMap }}
-            camera={{ position: [0, 4, 14], fov: 45 }}
-            gl={{ preserveDrawingBuffer: true }}
-          >
-            <SceneLighting targetPosition={anchorTransform?.position ?? null} />
+        <TextPreviewScene
+          anchorTransform={anchorTransform}
+          onLetterLevel={handleLetterLevel}
+          onSceneReady={() => setIsSceneReady(true)}
+          onDebugChange={setCameraDebug}
+          parsedFont={parsedFont}
+          hasText={hasText}
+          hasHeart={hasHeart}
+          nameValue={nameValue}
+          widthCm={widthCm}
+          heartWidthCm={heartWidthCm}
+          heartHeightCm={heartHeightCm}
+          heartDepth={heartDepth}
+          heartMaterial={heartMaterial}
+          heartSvg={heartSvg}
+          textDepth={textDepth}
+          engraveDepth={engraveDepth}
+          spacing={spacing}
+          textMaterial={textMaterial}
+          textElevation={textElevation}
+          textOffsetYcm={textOffsetYcm}
+          isEngraved={isEngraved}
+          textFitMarkers={textFitMarkers}
+          heartBorderPoints={heartBorderPoints}
+          textBorderPoints={textBorderPoints}
+          laserMarker={laserMarker}
+          laserSafety={laserSafety}
+          showSceneLoading={showSceneLoading}
+          onScreenshotReady={(handler) => {
+            screenshotHandlerRef.current = handler
+            setCanScreenshot(true)
+          }}
+          configuratorProps={{
+            nameValue,
+            onNameChange: setNameValue,
+            includeHeart,
+            onIncludeHeartChange: setIncludeHeart,
+            fontOptions,
+            selectedFontFile,
+            onSelectFont: setSelectedFontFile,
+            widthCm,
+            heightCm,
+            minTextHeightCm,
+            maxTextHeightCm,
+            onTextHeightChange: handleTextHeightChange,
+            heartWidthCm,
+            minHeartWidthCm: MIN_HEART_WIDTH_CM,
+            maxHeartWidthCm: MAX_HEART_WIDTH_CM,
+            onHeartWidthChange: handleHeartWidthChange,
+            heartHeightCm,
+            minHeartHeightCm: MIN_HEART_HEIGHT_CM,
+            maxHeartHeightCm: MAX_HEART_HEIGHT_CM,
+            onHeartHeightChange: handleHeartHeightChange,
+            heartVariants: HEART_VARIANTS,
+            selectedHeartVariant: heartVariant,
+            onSelectHeartVariant: setHeartVariant,
+            materialOptions,
+            heartMaterialOptions,
+            textMaterialOptions,
+            textMaterial,
+            onTextMaterialChange: setTextMaterial,
+            heartMaterial,
+            onHeartMaterialChange: setHeartMaterial,
+            thicknessOptions,
+            textThicknessMm,
+            onTextThicknessChange: setTextThicknessMm,
+            heartThicknessMm,
+            onHeartThicknessChange: setHeartThicknessMm,
+            spacing,
+            onSpacingChange: setSpacing,
+            textOffsetYcm: textOffsetDisplayCm,
+            onTextOffsetYChange: (value) => setTextOffsetYcm(value + 2),
+            engravingMode: isEngraved,
+            laserSafety,
+            textFitResult,
+            canRunLaserTest,
+            onRunLaserTest: handleRunLaserTest,
+          }}
+        />
 
-            <WorkbenchScene
-              onLetterLevel={handleLetterLevel}
-              onSceneReady={() => setIsSceneReady(true)}
-            />
-
-            {anchorTransform && (
-              <group
-                position={anchorTransform.position}
-                quaternion={anchorTransform.quaternion}
-              >
-                {hasHeart && (
-                  <PreviewHeart
-                    widthCm={heartWidthCm}
-                    heightCm={heartHeightCm}
-                    height={heartDepth}
-                    material={heartMaterial}
-                    svgText={heartSvg}
-                  />
-                )}
-                {parsedFont && hasText && (
-                  <PreviewLetters
-                    text={nameValue}
-                    widthCm={widthCm}
-                    height={isEngraved ? engraveDepth : textDepth}
-                    spacing={spacing}
-                    parsedFont={parsedFont}
-                    material={textMaterial}
-                    elevation={textElevation}
-                    offsetYcm={textOffsetYcm}
-                    renderMode={isEngraved ? "engraved" : "raised"}
-                  />
-                )}
-                {(hasHeart &&
-                  (textFitMarkers.length > 0 ||
-                    heartBorder.length > 0 ||
-                    textBorders.length > 0 ||
-                    (laserMarker && !laserSafety?.isSafe))) && (
-                  <group>
-                    {heartBorderPoints.length > 1 && (
-                      <line>
-                        <bufferGeometry attach="geometry">
-                          <bufferAttribute
-                            attach="attributes-position"
-                            args={[
-                              new Float32Array(
-                                heartBorderPoints.flatMap((point) => [
-                                  point.x,
-                                  point.y,
-                                  point.z,
-                                ])
-                              ),
-                              3,
-                            ]}
-                          />
-                        </bufferGeometry>
-                        <lineBasicMaterial color="#ffb020" />
-                      </line>
-                    )}
-
-                    {textBorderPoints.map((polyline, idx) => (
-                      <line key={`text-border-${idx}`}>
-                        <bufferGeometry attach="geometry">
-                          <bufferAttribute
-                            attach="attributes-position"
-                            args={[
-                              new Float32Array(
-                                polyline.flatMap((point) => [
-                                  point.x,
-                                  point.y,
-                                  point.z,
-                                ])
-                              ),
-                              3,
-                            ]}
-                          />
-                        </bufferGeometry>
-                        <lineBasicMaterial color="#6ee7ff" />
-                      </line>
-                    ))}
-
-                    {textFitMarkers.map(([xMm, yMm], index) => {
-                      const unit = WIDTH_CM_TO_SCENE_SIZE / 10
-                      const x = xMm * unit
-                      const z = yMm * unit
-                      return (
-                        <group
-                          key={`${index}-${xMm}-${yMm}`}
-                          position={[x, heartDepth + 0.004, z]}
-                        >
-                          <mesh>
-                            <sphereGeometry args={[0.004, 10, 10]} />
-                            <meshBasicMaterial color="#ff3b3b" />
-                          </mesh>
-                          <mesh position={[0, 0.01, 0]}>
-                            <coneGeometry args={[0.004, 0.012, 10]} />
-                            <meshBasicMaterial color="#ff3b3b" />
-                          </mesh>
-                        </group>
-                      )
-                    })}
-
-                    {laserMarker && !laserSafety?.isSafe && (
-                      (() => {
-                        const unit = WIDTH_CM_TO_SCENE_SIZE / 10
-                        const widthMm = widthCm * 10
-                        const offsetYmm = textOffsetYcm * 10
-                        const [xMm, yMm] = laserMarker
-                        const x = (xMm - widthMm / 2) * unit
-                        const z = (-yMm + offsetYmm) * unit
-                        const y =
-                          textElevation +
-                          (isEngraved ? engraveDepth : textDepth) +
-                          0.003
-                        return (
-                          <group position={[x, y, z]}>
-                            <mesh>
-                              <sphereGeometry args={[0.005, 10, 10]} />
-                              <meshBasicMaterial color="#ff7a18" />
-                            </mesh>
-                            <mesh position={[0, 0.012, 0]}>
-                              <coneGeometry args={[0.005, 0.014, 10]} />
-                              <meshBasicMaterial color="#ff7a18" />
-                            </mesh>
-                          </group>
-                        )
-                      })()
-                    )}
-                  </group>
-                )}
-              </group>
-            )}
-
-            <SceneCamera
-              targetPosition={anchorTransform?.position ?? null}
-              onDebugChange={setCameraDebug}
-            />
-
-            <ScreenshotBridge
-              onReady={(handler) => {
-                screenshotHandlerRef.current = handler
-                setCanScreenshot(true)
-              }}
-            />
-          </Canvas>
-
-          {showSceneLoading && (
-            <div className="pointer-events-none absolute inset-0 z-10 overflow-hidden">
-              <img
-                src="/maiherz-scene.png"
-                alt="3D Szene Vorschau"
-                className="h-full w-full object-cover"
-              />
-              <div className="absolute inset-0 flex items-center justify-center bg-stone-950/30">
-                <div className="flex items-center gap-3 rounded-full border border-stone-300/60 bg-stone-900/70 px-4 py-2 text-sm text-amber-50 shadow-sm">
-                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-amber-200 border-t-transparent" />
-                  Lade 3D Szene...
-                </div>
-              </div>
-            </div>
-          )}
-
-          <ConfiguratorPanel
-            nameValue={nameValue}
-            onNameChange={setNameValue}
-            includeHeart={includeHeart}
-            onIncludeHeartChange={setIncludeHeart}
-            fontOptions={fontOptions}
-            selectedFontFile={selectedFontFile}
-            onSelectFont={setSelectedFontFile}
-            widthCm={widthCm}
-            heightCm={heightCm}
-            minTextHeightCm={minTextHeightCm}
-            maxTextHeightCm={maxTextHeightCm}
-            onTextHeightChange={handleTextHeightChange}
-            heartWidthCm={heartWidthCm}
-            minHeartWidthCm={MIN_HEART_WIDTH_CM}
-            maxHeartWidthCm={MAX_HEART_WIDTH_CM}
-            onHeartWidthChange={handleHeartWidthChange}
-            heartHeightCm={heartHeightCm}
-            minHeartHeightCm={MIN_HEART_HEIGHT_CM}
-            maxHeartHeightCm={MAX_HEART_HEIGHT_CM}
-            onHeartHeightChange={handleHeartHeightChange}
-            heartVariants={HEART_VARIANTS}
-            selectedHeartVariant={heartVariant}
-            onSelectHeartVariant={setHeartVariant}
-            materialOptions={materialOptions}
-            heartMaterialOptions={heartMaterialOptions}
-            textMaterialOptions={textMaterialOptions}
-            textMaterial={textMaterial}
-            onTextMaterialChange={setTextMaterial}
-            heartMaterial={heartMaterial}
-            onHeartMaterialChange={setHeartMaterial}
-            thicknessOptions={thicknessOptions}
-            textThicknessMm={textThicknessMm}
-            onTextThicknessChange={setTextThicknessMm}
-            heartThicknessMm={heartThicknessMm}
-            onHeartThicknessChange={setHeartThicknessMm}
-            spacing={spacing}
-            onSpacingChange={setSpacing}
-            textOffsetYcm={textOffsetDisplayCm}
-            onTextOffsetYChange={(value) => setTextOffsetYcm(value + 2)}
-            engravingMode={isEngraved}
-            laserSafety={laserSafety}
-            textFitResult={textFitResult}
-            canRunLaserTest={canRunLaserTest}
-            onRunLaserTest={handleRunLaserTest}
-          />
-
-          {null}
-        </div>
-
-        <section className="mx-auto mt-4 w-[90%] pb-6 md:mt-5 md:pb-8">
-          <div className="grid gap-6 md:grid-cols-2">
-            <article
-              className="relative overflow-hidden rounded-xl border border-amber-200/20 bg-stone-950/30 bg-center bg-cover bg-blend-multiply p-4 text-amber-50 shadow-[0_18px_45px_rgba(0,0,0,0.35)] md:p-5"
-              style={{ backgroundImage: "url('/plywood_diff_1k_darkened.jpg')" }}
-            >
-              <h3 className="text-lg font-semibold text-amber-100">
-                Download &amp; Print
-              </h3>
-              <div className="mt-4 grid gap-3 text-amber-100/80">
-                <label className="grid gap-1 text-sm">
-                  Papierformat
-                  <select
-                    className="rounded border border-amber-200/25 bg-stone-900/80 px-3 py-2 text-amber-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
-                    value={printPaperSize}
-                    onChange={(e) =>
-                      setPrintPaperSize(e.target.value as "A4" | "A3")
-                    }
-                  >
-                    <option value="A4">A4 (Standard)</option>
-                    <option value="A3">A3</option>
-                  </select>
-                </label>
-                <label className="grid gap-1 text-sm">
-                  Ueberlappung zum Zusammenkleben (mm)
-                  <input
-                    type="number"
-                    min={0}
-                    max={30}
-                    step={1}
-                    className="rounded border border-amber-200/25 bg-stone-900/80 px-3 py-2 text-amber-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
-                    value={Number(printOverlapMm.toFixed(0))}
-                    onChange={(e) => {
-                      const next = Number(e.target.value)
-                      if (Number.isNaN(next)) return
-                      setPrintOverlapMm(Math.max(0, Math.min(30, next)))
-                    }}
-                  />
-                </label>
-                <p className="text-xs leading-5 text-amber-100/70">
-                  Das PDF ist massstabgetreu. Grosse Designs werden automatisch
-                  auf mehrere Seiten verteilt und mit Ueberlappungen markiert,
-                  damit du sie einfach zusammenkleben kannst.
-                </p>
-                <button
-                  type="button"
-                  onClick={handleDownloadPdf}
-                  disabled={printStatus === "loading"}
-                  className="mt-2 rounded border border-amber-200/30 bg-amber-100/15 px-4 py-2 text-sm font-medium text-amber-50 transition hover:bg-amber-100/25 disabled:cursor-not-allowed disabled:border-amber-200/10 disabled:bg-stone-900/60 disabled:text-amber-100/50"
-                >
-                  {printStatus === "loading"
-                    ? "PDF wird erstellt..."
-                    : "PDF herunterladen"}
-                </button>
-                <button
-                  type="button"
-                  onClick={handleDownloadScreenshot}
-                  disabled={!canScreenshot}
-                  className="rounded border border-amber-200/30 bg-amber-100/10 px-4 py-2 text-sm font-medium text-amber-50 transition hover:bg-amber-100/20 disabled:cursor-not-allowed disabled:border-amber-200/10 disabled:bg-stone-900/60 disabled:text-amber-100/50"
-                >
-                  Screenshot herunterladen
-                </button>
-                {printStatus === "error" && printError && (
-                  <p className="text-sm text-rose-200">{printError}</p>
-                )}
-              </div>
-            </article>
-
-            <div className="flex flex-col gap-4">
-              <article
-                className="relative overflow-hidden rounded-xl border border-amber-200/20 bg-stone-950/30 bg-center bg-cover bg-blend-multiply p-4 text-amber-50 shadow-[0_18px_45px_rgba(0,0,0,0.35)] md:p-5"
-                style={{ backgroundImage: "url('/plywood_diff_1k_darkened.jpg')" }}
-              >
-                <h3 className="text-lg font-semibold text-amber-100">
-                  Laserauftrag
-                </h3>
-                <div className="mt-4 grid gap-4">
-                  <div className="rounded-lg border border-amber-200/20 bg-stone-900/70 p-3">
-                    <h4 className="text-sm font-semibold text-amber-100">
-                      Objekte &amp; Lasertest
-                    </h4>
-                    <div className="mt-2 grid gap-3 text-sm text-amber-100/80">
-                      <div className="grid grid-cols-4 gap-3">
-                        <div className="text-sm text-amber-50">
-                          <span className="text-xs uppercase tracking-wide text-amber-100/60">
-                            Text
-                          </span>
-                          : {widthCm.toFixed(1)} x {heightCm.toFixed(1)} cm
-                        </div>
-                        <div className="text-sm text-amber-50">
-                          <span className="text-xs uppercase tracking-wide text-amber-100/60">
-                            Herz
-                          </span>
-                          :{" "}
-                          {hasHeart
-                            ? `${heartWidthCm.toFixed(1)} x ${heartHeightCm.toFixed(1)} cm`
-                            : "deaktiviert"}
-                        </div>
-                        <div className="flex items-center gap-2 text-sm text-amber-50">
-                          <span className="text-xs uppercase tracking-wide text-amber-100/60">
-                            Linienabstand
-                          </span>
-                          {laserSafety ? (
-                            laserSafety.isSafe ? (
-                              successIcon
-                            ) : (
-                              <span className="text-rose-200">
-                                nicht bestanden
-                              </span>
-                            )
-                          ) : (
-                            <span className="text-amber-200">nicht getestet</span>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-2 text-sm text-amber-50">
-                          <span className="text-xs uppercase tracking-wide text-amber-100/60">
-                            Text im Herz
-                          </span>
-                          {!hasHeart ? (
-                            <span className="text-amber-100/60">-</span>
-                          ) : textFitResult ? (
-                              textFitResult.result.isSafe ? (
-                                successIcon
-                              ) : (
-                                <span className="text-rose-200">
-                                  nicht bestanden
-                                </span>
-                              )
-                            ) : (
-                              <span className="text-amber-200">nicht getestet</span>
-                            )}
-                        </div>
-                      </div>
-                      <div className="pt-1 text-amber-100/70">
-                        Fläche gesamt: {roughAreaM2.toFixed(3)} m2
-                      </div>
-                      <div className="text-base font-semibold text-amber-50">
-                        {priceFormatter.format(roughPriceEur)}
-                      </div>
-                    </div>
-                    {!hasRunLaserTest && (
-                      <div className="mt-3 rounded border border-amber-200/30 bg-amber-100/15 px-3 py-2 text-xs text-amber-100">
-                        Bitte Lasertest ausführen, um die Anfrage freizuschalten.
-                      </div>
-                    )}
-                    <button
-                      type="button"
-                      onClick={handleRunLaserTest}
-                      disabled={!canRunLaserTest}
-                      className="mt-3 rounded border border-amber-200/30 bg-amber-100/15 px-3 py-2 text-xs font-medium text-amber-50 transition hover:bg-amber-100/25 disabled:cursor-not-allowed disabled:border-amber-200/10 disabled:bg-stone-900/60 disabled:text-amber-100/50"
-                    >
-                      Lasertest ausführen
-                    </button>
-                  </div>
-
-                  <div className="rounded-lg border border-amber-200/20 bg-stone-900/70 p-3">
-                    <h4 className="text-sm font-semibold text-amber-100">
-                      Kontakt
-                    </h4>
-                    <form className="mt-3 grid gap-3 text-amber-100/80">
-                      <label className="grid gap-1 text-sm">
-                        Vollständiger Name
-                        <input
-                          type="text"
-                          placeholder="Max Mustermann"
-                          className="rounded border border-amber-200/25 bg-stone-900/80 px-3 py-2 text-amber-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
-                          value={contactName}
-                          onChange={(e) => setContactName(e.target.value)}
-                        />
-                      </label>
-                      <label className="grid gap-1 text-sm">
-                        E-Mail
-                        <input
-                          type="email"
-                          placeholder="name@beispiel.de"
-                          className="rounded border border-amber-200/25 bg-stone-900/80 px-3 py-2 text-amber-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
-                          value={contactEmail}
-                          onChange={(e) => setContactEmail(e.target.value)}
-                        />
-                      </label>
-                      <label className="grid gap-1 text-sm">
-                        Telefonnummer (optional)
-                        <input
-                          type="tel"
-                          placeholder="+49 ..."
-                          className="rounded border border-amber-200/25 bg-stone-900/80 px-3 py-2 text-amber-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
-                          value={contactPhone}
-                          onChange={(e) => setContactPhone(e.target.value)}
-                        />
-                      </label>
-                      <label className="grid gap-1 text-sm">
-                        Nachricht
-                        <textarea
-                          rows={3}
-                          placeholder="Hinweise zum Design oder Wunschlieferzeit"
-                          className="rounded border border-amber-200/25 bg-stone-900/80 px-3 py-2 text-amber-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
-                          value={contactMessage}
-                          onChange={(e) => setContactMessage(e.target.value)}
-                        />
-                      </label>
-                      <p className="text-xs leading-5 text-amber-100/70">
-                        Mit dem Absenden des Formulars erklärst du dich damit
-                        einverstanden, dass deine Angaben zur Bearbeitung deiner Anfrage
-                        verarbeitet werden. Weitere Informationen findest du in unserer
-                        Datenschutzerklärung.
-                      </p>
-                      <p className="text-xs leading-5 text-amber-100/70">
-                        Die über den Konfigurator übermittelten Anfragen stellen kein
-                        verbindliches Angebot dar.
-                      </p>
-                      <button
-                        type="button"
-                        onClick={handleSendRequest}
-                        disabled={!canSubmitRequest}
-                        className="mt-2 rounded bg-amber-200/20 px-4 py-2 text-sm font-medium text-amber-50 transition hover:bg-amber-200/30 disabled:cursor-not-allowed disabled:bg-stone-900/60 disabled:text-amber-100/50"
-                      >
-                        {requestStatus === "sending"
-                          ? "Wird gesendet..."
-                          : "Auftragsanfrage abschicken"}
-                      </button>
-                      {!hasRunLaserTest && (
-                        <p className="text-xs text-amber-200">
-                          Lasertest erforderlich, bevor du die Anfrage absenden kannst.
-                        </p>
-                      )}
-                      {requestStatus === "success" && (
-                        <p className="text-sm text-emerald-200">
-                          Anfrage wurde gesendet. Danke!
-                        </p>
-                      )}
-                      {requestStatus === "error" && requestError && (
-                        <p className="text-sm text-rose-200">{requestError}</p>
-                      )}
-                    </form>
-                  </div>
-                </div>
-              </article>
-            </div>
-          </div>
-        </section>
-
+        <TextPreviewPanels
+          printPaperSize={printPaperSize}
+          setPrintPaperSize={setPrintPaperSize}
+          printOverlapMm={printOverlapMm}
+          setPrintOverlapMm={setPrintOverlapMm}
+          onDownloadPdf={handleDownloadPdf}
+          printStatus={printStatus}
+          printError={printError}
+          onDownloadScreenshot={handleDownloadScreenshot}
+          canScreenshot={canScreenshot}
+          widthCm={widthCm}
+          heightCm={heightCm}
+          hasHeart={hasHeart}
+          heartWidthCm={heartWidthCm}
+          heartHeightCm={heartHeightCm}
+          laserSafety={laserSafety}
+          textFitResult={textFitResult}
+          roughAreaM2={roughAreaM2}
+          roughPriceEur={roughPriceEur}
+          priceFormatter={priceFormatter}
+          hasRunLaserTest={hasRunLaserTest}
+          canRunLaserTest={canRunLaserTest}
+          onRunLaserTest={handleRunLaserTest}
+          contactName={contactName}
+          setContactName={setContactName}
+          contactEmail={contactEmail}
+          setContactEmail={setContactEmail}
+          contactPhone={contactPhone}
+          setContactPhone={setContactPhone}
+          contactMessage={contactMessage}
+          setContactMessage={setContactMessage}
+          onSendRequest={handleSendRequest}
+          canSubmitRequest={canSubmitRequest}
+          requestStatus={requestStatus}
+          requestError={requestError}
+        />
       </main>
     </div>
   )

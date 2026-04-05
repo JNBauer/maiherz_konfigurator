@@ -14,10 +14,10 @@
           <h2 className="text-lg font-semibold">1. Verantwortlicher</h2>
           <p>
             Julian Bauer<br />
-            [Aggerstrasse 2]<br />
-            [53859 Niederkassel]<br />
+            Aggerstrasse 2<br />
+            53859 Niederkassel<br />
             Deutschland<br />
-            E-Mail: deine-email@example.com
+            E-Mail: anfrage@mai-herz.de
           </p>
 
           <h2 className="text-lg font-semibold">2. Hosting</h2>

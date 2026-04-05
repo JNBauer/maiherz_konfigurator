@@ -8,13 +8,13 @@ export default function AcknowledgmentPage() {
       <main className="w-full px-4 pb-10 pt-6 md:px-6 md:pt-8">
         <section className="mx-auto w-full max-w-4xl text-stone-900">
           <div className="rounded-2xl border border-stone-200 bg-white p-7 shadow-sm md:p-8">
-            
+
             <h1 className="text-3xl font-semibold">Danksagungen</h1>
 
             <div className="mt-6 space-y-8 text-base leading-7 text-stone-800">
-              
+
               <p>
-                Die in diesem Konfigurator verwendeten Schriftarten, Texturen und 3D-Assets werden hier aufgeführt.
+                Hier werden die in diesem Konfigurator verwendeten Schriftarten, Texturen und 3D-Assets aufgeführt.
                 Ich bin den Entwickler:innen und Künstler:innen sehr dankbar, die ihre Arbeiten öffentlich zur Verfügung stellen.
                 Falls dir fehlende Quellenangaben auffallen, melde dich bitte gerne.
               </p>
@@ -32,6 +32,11 @@ export default function AcknowledgmentPage() {
                   <li>
                     <span className="font-medium">Tangerine</span>{" "}
                     <span className="text-stone-500">von Toshi Omagari</span><br />
+
+                    <span className="text-stone-600">
+                      Leicht modifiziert und variiert für dieses Projekt
+                    </span><br />
+
                     <a href="https://www.tosche.net/fonts" className="underline">
                       Künstlerseite
                     </a>
