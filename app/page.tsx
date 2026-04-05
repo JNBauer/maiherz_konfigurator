@@ -162,25 +162,27 @@ export default function Home() {
             />
             <div className="absolute inset-0 bg-gradient-to-t from-stone-950/85 via-stone-950/10 to-transparent" />
             <figcaption className="relative px-4 py-3 text-sm text-amber-100/80">
-              Platzhalterbild: 3D Szene im Konfigurator als realistische Größen-
-              und Formhilfe.
+              Beispielansicht: 3D-Vorschau im Konfigurator zur realistischen Einschätzung von Größe und Form.
             </figcaption>
           </figure>
+
           <div
             className="relative overflow-hidden rounded-xl border border-amber-200/20 bg-stone-950/30 bg-center bg-cover bg-blend-multiply p-6 text-amber-50 shadow-[0_18px_45px_rgba(0,0,0,0.35)]"
             style={{ backgroundImage: "url('/plywood_diff_1k_darkened.jpg')" }}
           >
             <h2 className="text-2xl font-semibold text-amber-50">
-              Dein Entwurf, sauber vorbereitet
+              Dein Entwurf, professionell umgesetzt
             </h2>
             <p className="mt-3 text-lg leading-7 text-amber-100/80">
-              Jedes Maiherz entsteht nach deinen Angaben: Name, Schriftstil,
-              Größe, Material, Herzform und optional Gravur. Die 3D-Vorschau
-              hilft dir, Lesbarkeit, Abstände und die Wirkung im Raum zu prüfen.
+              Jedes Maiherz wird individuell nach deinen Angaben gefertigt: Name,
+              Schriftstil, Größe, Material, Herzform und optional eine Gravur. Die
+              3D-Vorschau hilft dir dabei, Lesbarkeit, Abstände und die Gesamtwirkung
+              realistisch einzuschätzen.
             </p>
             <p className="mt-3 text-lg leading-7 text-amber-100/80">
-              Für Sonderwünsche wie Logos, spezielle Maße oder Materialien kannst
-              du Hinweise direkt in der Anfrage ergänzen.
+              Sonderwünsche wie zusätzliche Motive, Drehungen, spezielle Maße oder
+              Materialien kannst du einfach in deiner Anfrage angeben. Gemeinsam klären
+              wir anschließend per E-Mail, wie sich deine Ideen optimal umsetzen lassen.
             </p>
           </div>
         </div>
@@ -191,6 +193,7 @@ export default function Home() {
           <h2 className="text-2xl font-semibold text-stone-900">
             Details, Vorteile und Hinweise
           </h2>
+
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             <article
               className="relative overflow-hidden rounded-xl border border-amber-200/20 bg-stone-950/30 bg-center bg-cover bg-blend-multiply p-5 text-amber-50 shadow-[0_18px_45px_rgba(0,0,0,0.35)]"
@@ -201,11 +204,12 @@ export default function Home() {
               </h3>
               <p className="mt-2 text-base leading-7 text-amber-100/80">
                 Du bestimmst Schrift, Größe, Material und Herzform. Ob schlicht,
-                verspielt oder mit Gravur – das Maiherz wird passend zu deinem
-                Anlass vorbereitet. Ideal für persönliche Geschenke, Vereine
-                oder Firmen.
+                verspielt oder mit Gravur – dein Maiherz wird exakt nach deinen
+                Vorstellungen gefertigt. So kannst du dich entspannt zurücklehnen und
+                weißt genau, was du am Ende erhältst.
               </p>
             </article>
+
             <article
               className="relative overflow-hidden rounded-xl border border-amber-200/20 bg-stone-950/30 bg-center bg-cover bg-blend-multiply p-5 text-amber-50 shadow-[0_18px_45px_rgba(0,0,0,0.35)]"
               style={{ backgroundImage: "url('/plywood_diff_1k_darkened.jpg')" }}
@@ -214,12 +218,13 @@ export default function Home() {
                 Laserschneiden &amp; Materialien
               </h3>
               <p className="mt-2 text-base leading-7 text-amber-100/80">
-                Für saubere Kanten und präzise Details eignet sich der
-                Laserschnitt besonders gut. Wähle zwischen MDF, Multiplex oder
-                Acryl und verschiedenen Materialstärken. Die Vorschau und der
-                Lasertest helfen, feine Stege sicher umzusetzen.
+                Der Laserschnitt sorgt für präzise Konturen und saubere Kanten – auch
+                bei feinen Details. Du kannst zwischen MDF, Multiplex und Acryl sowie
+                verschiedenen Materialstärken wählen. Vorschau und Lasertest helfen dir,
+                dein Design sicher und stabil umzusetzen.
               </p>
             </article>
+
             <article
               className="relative overflow-hidden rounded-xl border border-amber-200/20 bg-stone-950/30 bg-center bg-cover bg-blend-multiply p-5 text-amber-50 shadow-[0_18px_45px_rgba(0,0,0,0.35)]"
               style={{ backgroundImage: "url('/plywood_diff_1k_darkened.jpg')" }}
@@ -229,11 +234,12 @@ export default function Home() {
               </h3>
               <p className="mt-2 text-base leading-7 text-amber-100/80">
                 Vorteile: hohe Präzision, gleichmäßige Ergebnisse und flexible
-                Materialien. Grenzen: sehr filigrane Schriften oder enge
-                Innenräume können empfindlich sein. Der Lasertest zeigt dir früh,
-                ob ein Design stabil genug ist.
+                Materialwahl. Grenzen: Sehr filigrane Schriften oder enge Innenräume
+                können empfindlich sein. Der Lasertest zeigt dir frühzeitig, ob dein
+                Entwurf stabil genug ist.
               </p>
             </article>
+
             <article
               className="relative overflow-hidden rounded-xl border border-amber-200/20 bg-stone-950/30 bg-center bg-cover bg-blend-multiply p-5 text-amber-50 shadow-[0_18px_45px_rgba(0,0,0,0.35)]"
               style={{ backgroundImage: "url('/plywood_diff_1k_darkened.jpg')" }}
@@ -242,10 +248,10 @@ export default function Home() {
                 Weitere Hinweise
               </h3>
               <p className="mt-2 text-base leading-7 text-amber-100/80">
-                Beim Download-Print erhältst du eine maßstabgetreue Schablone,
-                die sich bei großen Größen auf mehrere Seiten verteilt. Achte
-                darauf, den Ausdruck ohne Skalierung zu drucken. Für den
-                Laserauftrag bitte vor dem Absenden den Lasertest durchführen.
+                Beim Download erhältst du eine maßstabsgetreue PDF-Schablone, die bei
+                größeren Formaten auf mehrere Seiten aufgeteilt ist. Achte darauf, den
+                Ausdruck ohne Skalierung zu drucken. Für die Laserfertigung ist es
+                erforderlich, vor dem Absenden den Lasertest durchzuführen.
               </p>
             </article>
           </div>
@@ -266,11 +272,14 @@ export default function Home() {
                 Wie genau ist die 3D-Vorschau?
               </h3>
               <p className="mt-2 text-base leading-7 text-amber-100/80">
-                Die Vorschau zeigt Proportionen, Abstände und die Wirkung des
-                Textes im Herz. Für exakte Maße nutze die angezeigten
-                Zentimeterwerte und die PDF-Schablone.
+                Die Vorschau zeigt dir realistische Proportionen, Abstände und die
+                Wirkung des Textes im Herz. Kleine Abweichungen sind möglich, da beim
+                Laserschneiden minimale Toleranzen entstehen können. Für exakte Maße
+                orientiere dich bitte an den angegebenen Zentimeterwerten sowie an der
+                PDF-Schablone.
               </p>
             </article>
+
             <article
               className="relative overflow-hidden rounded-xl border border-amber-200/20 bg-stone-950/30 bg-center bg-cover bg-blend-multiply p-5 text-amber-50 shadow-[0_18px_45px_rgba(0,0,0,0.35)]"
               style={{ backgroundImage: "url('/plywood_diff_1k_darkened.jpg')" }}
@@ -279,11 +288,12 @@ export default function Home() {
                 Kann ich eigene Schriftarten nutzen?
               </h3>
               <p className="mt-2 text-base leading-7 text-amber-100/80">
-                Wähle aus den verfügbaren Schriften im Konfigurator. Wenn du
-                eine spezielle Schrift brauchst, vermerke den Wunsch in der
-                Anfrage.
+                Du kannst aus den verfügbaren Schriftarten im Konfigurator wählen.
+                Wenn du eine individuelle Schrift verwenden möchtest, schreibe mir
+                einfach eine Nachricht – ich prüfe gerne, ob sich diese umsetzen lässt.
               </p>
             </article>
+
             <article
               className="relative overflow-hidden rounded-xl border border-amber-200/20 bg-stone-950/30 bg-center bg-cover bg-blend-multiply p-5 text-amber-50 shadow-[0_18px_45px_rgba(0,0,0,0.35)]"
               style={{ backgroundImage: "url('/plywood_diff_1k_darkened.jpg')" }}
@@ -292,8 +302,40 @@ export default function Home() {
                 Was passiert nach dem Absenden?
               </h3>
               <p className="mt-2 text-base leading-7 text-amber-100/80">
-                Wir prüfen die Angaben, melden uns bei Rückfragen und bestätigen
-                die Umsetzung. Danach vereinbaren wir den nächsten Schritt.
+                Nach dem Absenden erhältst du eine E-Mail mit deinen Angaben. Ich
+                prüfe deine Anfrage und melde mich bei dir – entweder zur Bestätigung
+                oder mit Rückfragen. Sobald alles passt, bestätigen wir gemeinsam die
+                Umsetzung und besprechen die nächsten Schritte.
+              </p>
+            </article>
+
+            <article
+              className="relative overflow-hidden rounded-xl border border-amber-200/20 bg-stone-950/30 bg-center bg-cover bg-blend-multiply p-5 text-amber-50 shadow-[0_18px_45px_rgba(0,0,0,0.35)]"
+              style={{ backgroundImage: "url('/plywood_diff_1k_darkened.jpg')" }}
+            >
+              <h3 className="text-base font-semibold text-amber-50">
+                Wofür ist der Lasertest?
+              </h3>
+              <p className="mt-2 text-base leading-7 text-amber-100/80">
+                Der Lasertest stellt sicher, dass dein gewünschtes Design technisch
+                sauber umgesetzt werden kann und stabil bleibt. Besonders bei
+                filigranen Schriften verhindert er, dass Teile beim Schneiden brechen.
+                Für den Download der PDF-Schablone ist der Lasertest nicht erforderlich.
+              </p>
+            </article>
+
+            <article
+              className="relative overflow-hidden rounded-xl border border-amber-200/20 bg-stone-950/30 bg-center bg-cover bg-blend-multiply p-5 text-amber-50 shadow-[0_18px_45px_rgba(0,0,0,0.35)]"
+              style={{ backgroundImage: "url('/plywood_diff_1k_darkened.jpg')" }}
+            >
+              <h3 className="text-base font-semibold text-amber-50">
+                Kann ich die Größen von Schrift und Herz verändern?
+              </h3>
+              <p className="mt-2 text-base leading-7 text-amber-100/80">
+                Ja, Höhe, Breite und Abstände lassen sich individuell anpassen, bis
+                alles für dich stimmig ist. Nutze die Hintergrundfläche als Orientierung
+                für die tatsächliche Größe. Bitte beachte: Größere Maße erhöhen den
+                Materialverbrauch und können sich auf den Preis auswirken.
               </p>
             </article>
             <article
@@ -301,35 +343,46 @@ export default function Home() {
               style={{ backgroundImage: "url('/plywood_diff_1k_darkened.jpg')" }}
             >
               <h3 className="text-base font-semibold text-amber-50">
-                Ist der Lasertest verpflichtend?
+                Was ist MDF und wann eignet es sich?
               </h3>
               <p className="mt-2 text-base leading-7 text-amber-100/80">
-                Ja, der Lasertest stellt sicher, dass dein Text stabil bleibt.
-                Erst danach kann die Anfrage abgeschickt werden.
+                <strong>MDF (Mitteldichte Faserplatte)</strong> ist die preisgünstigere
+                Option. Es besteht aus fein gepressten Holzfasern und hat eine sehr
+                glatte Oberfläche, die sich ideal zum Bemalen eignet. Allerdings ist MDF
+                weniger stabil und nur bedingt witterungsbeständig – daher eher für
+                kurzfristige oder geschützte Einsätze geeignet.
               </p>
             </article>
+
             <article
               className="relative overflow-hidden rounded-xl border border-amber-200/20 bg-stone-950/30 bg-center bg-cover bg-blend-multiply p-5 text-amber-50 shadow-[0_18px_45px_rgba(0,0,0,0.35)]"
               style={{ backgroundImage: "url('/plywood_diff_1k_darkened.jpg')" }}
             >
               <h3 className="text-base font-semibold text-amber-50">
-                Kann ich mehrere Größen ausprobieren?
+                Was ist Multiplex und welche Vorteile hat es?
               </h3>
               <p className="mt-2 text-base leading-7 text-amber-100/80">
-                Ja, ändere Höhe, Breite und Abstand, bis die Vorschau und die
-                Abstände passen. Die grobe Fläche hilft dir bei der Einschätzung.
+                <strong>Multiplex</strong> ist deutlich stabiler und hochwertiger. Es
+                besteht aus mehreren verleimten Echtholz-Schichten und ist dadurch
+                besonders robust und formstabil. Gerade bei filigranen Schriftzügen ist
+                Multiplex die bessere Wahl, da es weniger bruchanfällig ist und sich auch
+                für den Außenbereich eignet.
               </p>
             </article>
+
             <article
               className="relative overflow-hidden rounded-xl border border-amber-200/20 bg-stone-950/30 bg-center bg-cover bg-blend-multiply p-5 text-amber-50 shadow-[0_18px_45px_rgba(0,0,0,0.35)]"
               style={{ backgroundImage: "url('/plywood_diff_1k_darkened.jpg')" }}
             >
               <h3 className="text-base font-semibold text-amber-50">
-                Welche Materialien stehen zur Wahl?
+                Was ist Acryl und wann ist es die beste Wahl?
               </h3>
               <p className="mt-2 text-base leading-7 text-amber-100/80">
-                Du kannst zwischen MDF, Multiplex und Acryl wählen. Je nach
-                Material wirken Kanten, Farbe und Lichtdurchlass unterschiedlich.
+                <strong>Acryl</strong> ist ein wetterfestes, langlebiges
+                Kunststoffmaterial mit einer modernen, glatten Optik. Es ist bereits weiß
+                (oder in Wunschfarbe erhältlich) und muss nicht gestrichen werden.
+                Dadurch ist es besonders pflegeleicht und ideal für Maipherzen, die
+                dauerhaft draußen aufgehängt werden.
               </p>
             </article>
           </div>

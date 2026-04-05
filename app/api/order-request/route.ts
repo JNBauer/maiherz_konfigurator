@@ -1,3 +1,4 @@
+import { basename } from "node:path"
 import { NextResponse } from "next/server"
 import nodemailer from "nodemailer"
 
@@ -72,7 +73,11 @@ export async function POST(request: Request) {
       auth: { user, pass },
     })
 
-    const summary = [
+    const heartVariantLabel = body.heartVariant
+      ? basename(body.heartVariant, ".svg")
+      : "n/a"
+
+    const summaryLines = [
       `Name: ${body.fullName}`,
       `E-Mail: ${body.email}`,
       body.phone ? `Telefon: ${body.phone}` : null,
@@ -80,7 +85,7 @@ export async function POST(request: Request) {
       "",
       "Design:",
       `Herz aktiv: ${body.includeHeart ? "Ja" : "Nein"}`,
-      `Herz Variante: ${body.heartVariant}`,
+      `Herz Variante: ${heartVariantLabel}`,
       `Herz Material: ${body.heartMaterial}`,
       `Herz Größe: ${body.heartWidthCm} x ${body.heartHeightCm} cm`,
       `Herz Dicke: ${body.heartThicknessMm} mm`,
@@ -92,13 +97,13 @@ export async function POST(request: Request) {
       `Text Dicke: ${body.textThicknessMm} mm`,
       `Spacing: ${body.spacing}`,
       `Font: ${body.selectedFontFile}`,
-    ]
-      .filter(Boolean)
-      .join("\n")
+    ].filter((line): line is string => Boolean(line))
+
+    const summary = summaryLines.join("\n")
 
     await transporter.sendMail({
       from,
-      to: "julian.bauer28@gmail.com",
+      to: ["julian.bauer28@gmail.com", "anfrage@mai-herz.de"],
       subject: "Neue Auftragsanfrage",
       text: summary,
       attachments: [
@@ -108,6 +113,29 @@ export async function POST(request: Request) {
           contentType: "image/svg+xml",
         },
       ],
+    })
+
+    const customerSummary = summaryLines
+      .filter((line) => !line.startsWith("E-Mail:"))
+      .join("\n")
+    const customerMessage = [
+      `Hallo ${body.fullName},`,
+      "",
+      "vielen Dank für deine Anfrage für ein persönliches Maiherz.",
+      "Ich schaue mir deine Angaben an und melde mich in Kürze bei dir.",
+      "",
+      "Zusammenfassung deiner Konfiguration:",
+      customerSummary,
+      "",
+      "Viele Grüße",
+      "Julian",
+    ].join("\n")
+
+    await transporter.sendMail({
+      from,
+      to: body.email,
+      subject: "Bestaetigung deiner Maiherz-Anfrage",
+      text: customerMessage,
     })
 
     return NextResponse.json({ ok: true })
