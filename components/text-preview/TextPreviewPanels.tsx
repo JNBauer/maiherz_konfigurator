@@ -90,6 +90,7 @@ export default function TextPreviewPanels({
     <section className="mx-auto mt-4 w-[90%] pb-6 md:mt-5 md:pb-8">
       <div className="grid gap-6 md:grid-cols-2">
         <article
+          id="download-print"
           className="relative overflow-hidden rounded-xl border border-amber-200/20 bg-stone-950/30 bg-center bg-cover bg-blend-multiply p-4 text-amber-50 shadow-[0_18px_45px_rgba(0,0,0,0.35)] md:p-5"
           style={{ backgroundImage: "url('/plywood_diff_1k_darkened.jpg')" }}
         >
@@ -97,7 +98,7 @@ export default function TextPreviewPanels({
             Download &amp; Print
           </h3>
           <div className="mt-4 grid gap-3 text-amber-100/80">
-            <label className="grid gap-1 text-sm">
+            <label className="grid gap-1 text-base">
               Papierformat
               <select
                 className="rounded border border-amber-200/25 bg-stone-900/80 px-3 py-2 text-amber-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]"
@@ -108,8 +109,8 @@ export default function TextPreviewPanels({
                 <option value="A3">A3</option>
               </select>
             </label>
-            <label className="grid gap-1 text-sm">
-              Üerlappung zum Zusammenkleben (mm)
+            <label className="grid gap-1 text-base">
+              Überlappung zum Zusammenkleben (mm)
               <input
                 type="number"
                 min={0}
@@ -124,8 +125,8 @@ export default function TextPreviewPanels({
                 }}
               />
             </label>
-            <p className="text-xs leading-5 text-amber-100/70">
-              Das PDF ist massstabgetreu. Grosse Designs werden automatisch
+            <p className="text-sm leading-6 text-amber-100/70">
+              Das PDF ist maßstabgetreu. Große Designs werden automatisch
               auf mehrere Seiten verteilt und mit Überlappungen markiert,
               damit du sie einfach zusammenkleben kannst.
             </p>
@@ -133,7 +134,7 @@ export default function TextPreviewPanels({
               type="button"
               onClick={onDownloadPdf}
               disabled={printStatus === "loading"}
-              className="mt-2 rounded border border-amber-200/30 bg-amber-100/15 px-4 py-2 text-sm font-medium text-amber-50 transition hover:bg-amber-100/25 disabled:cursor-not-allowed disabled:border-amber-200/10 disabled:bg-stone-900/60 disabled:text-amber-100/50"
+              className="mt-2 rounded border border-amber-200/30 bg-amber-100/15 px-4 py-2 text-base font-medium text-amber-50 transition hover:bg-amber-100/25 disabled:cursor-not-allowed disabled:border-amber-200/10 disabled:bg-stone-900/60 disabled:text-amber-100/50"
             >
               {printStatus === "loading"
                 ? "PDF wird erstellt..."
@@ -143,18 +144,19 @@ export default function TextPreviewPanels({
               type="button"
               onClick={onDownloadScreenshot}
               disabled={!canScreenshot}
-              className="rounded border border-amber-200/30 bg-amber-100/10 px-4 py-2 text-sm font-medium text-amber-50 transition hover:bg-amber-100/20 disabled:cursor-not-allowed disabled:border-amber-200/10 disabled:bg-stone-900/60 disabled:text-amber-100/50"
+              className="rounded border border-amber-200/30 bg-amber-100/10 px-4 py-2 text-base font-medium text-amber-50 transition hover:bg-amber-100/20 disabled:cursor-not-allowed disabled:border-amber-200/10 disabled:bg-stone-900/60 disabled:text-amber-100/50"
             >
               Screenshot herunterladen
             </button>
             {printStatus === "error" && printError && (
-              <p className="text-sm text-rose-200">{printError}</p>
+              <p className="text-base text-rose-200">{printError}</p>
             )}
           </div>
         </article>
 
         <div className="flex flex-col gap-4">
           <article
+            id="laserauftrag"
             className="relative overflow-hidden rounded-xl border border-amber-200/20 bg-stone-950/30 bg-center bg-cover bg-blend-multiply p-4 text-amber-50 shadow-[0_18px_45px_rgba(0,0,0,0.35)] md:p-5"
             style={{ backgroundImage: "url('/plywood_diff_1k_darkened.jpg')" }}
           >
@@ -163,19 +165,19 @@ export default function TextPreviewPanels({
             </h3>
             <div className="mt-4 grid gap-4">
               <div className="rounded-lg border border-amber-200/20 bg-stone-900/70 p-3">
-                <h4 className="text-sm font-semibold text-amber-100">
+                <h4 className="text-base font-semibold text-amber-100">
                   Objekte &amp; Lasertest
                 </h4>
-                <div className="mt-2 grid gap-3 text-sm text-amber-100/80">
+                <div className="mt-2 grid gap-3 text-base text-amber-100/80">
                   <div className="grid grid-cols-4 gap-3">
-                    <div className="text-sm text-amber-50">
-                      <span className="text-xs uppercase tracking-wide text-amber-100/60">
+                    <div className="text-base text-amber-50">
+                      <span className="text-sm uppercase tracking-wide text-amber-100/60">
                         Text
                       </span>
                       : {widthCm.toFixed(1)} x {heightCm.toFixed(1)} cm
                     </div>
-                    <div className="text-sm text-amber-50">
-                      <span className="text-xs uppercase tracking-wide text-amber-100/60">
+                    <div className="text-base text-amber-50">
+                      <span className="text-sm uppercase tracking-wide text-amber-100/60">
                         Herz
                       </span>
                       :{" "}
@@ -183,8 +185,8 @@ export default function TextPreviewPanels({
                         ? `${heartWidthCm.toFixed(1)} x ${heartHeightCm.toFixed(1)} cm`
                         : "deaktiviert"}
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-amber-50">
-                      <span className="text-xs uppercase tracking-wide text-amber-100/60">
+                    <div className="flex items-center gap-2 text-base text-amber-50">
+                      <span className="text-sm uppercase tracking-wide text-amber-100/60">
                         Linienabstand
                       </span>
                       {laserSafety ? (
@@ -199,8 +201,8 @@ export default function TextPreviewPanels({
                         <span className="text-amber-200">nicht getestet</span>
                       )}
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-amber-50">
-                      <span className="text-xs uppercase tracking-wide text-amber-100/60">
+                    <div className="flex items-center gap-2 text-base text-amber-50">
+                      <span className="text-sm uppercase tracking-wide text-amber-100/60">
                         Text im Herz
                       </span>
                       {!hasHeart ? (
@@ -218,15 +220,15 @@ export default function TextPreviewPanels({
                         )}
                     </div>
                   </div>
-                  <div className="pt-1 text-amber-100/70">
+                  <div className="pt-1 text-base text-amber-100/70">
                     Fläche gesamt: {roughAreaM2.toFixed(3)} m2
                   </div>
-                  <div className="text-base font-semibold text-amber-50">
+                  <div className="text-lg font-semibold text-amber-50">
                     {priceFormatter.format(roughPriceEur)}
                   </div>
                 </div>
                 {!hasRunLaserTest && (
-                  <div className="mt-3 rounded border border-amber-200/30 bg-amber-100/15 px-3 py-2 text-xs text-amber-100">
+                  <div className="mt-3 rounded border border-amber-200/30 bg-amber-100/15 px-3 py-2 text-sm text-amber-100">
                     Bitte Lasertest ausführen, um die Anfrage freizuschalten.
                   </div>
                 )}
@@ -234,18 +236,18 @@ export default function TextPreviewPanels({
                   type="button"
                   onClick={onRunLaserTest}
                   disabled={!canRunLaserTest}
-                  className="mt-3 rounded border border-amber-200/30 bg-amber-100/15 px-3 py-2 text-xs font-medium text-amber-50 transition hover:bg-amber-100/25 disabled:cursor-not-allowed disabled:border-amber-200/10 disabled:bg-stone-900/60 disabled:text-amber-100/50"
+                  className="mt-3 rounded border border-amber-200/30 bg-amber-100/15 px-3 py-2 text-sm font-medium text-amber-50 transition hover:bg-amber-100/25 disabled:cursor-not-allowed disabled:border-amber-200/10 disabled:bg-stone-900/60 disabled:text-amber-100/50"
                 >
-                  Lasertest ausfÜhren
+                  Lasertest ausführen
                 </button>
               </div>
 
               <div className="rounded-lg border border-amber-200/20 bg-stone-900/70 p-3">
-                <h4 className="text-sm font-semibold text-amber-100">
+                <h4 className="text-base font-semibold text-amber-100">
                   Kontakt
                 </h4>
                 <form className="mt-3 grid gap-3 text-amber-100/80">
-                  <label className="grid gap-1 text-sm">
+                  <label className="grid gap-1 text-base">
                     Vollständiger Name
                     <input
                       type="text"
@@ -255,7 +257,7 @@ export default function TextPreviewPanels({
                       onChange={(e) => setContactName(e.target.value)}
                     />
                   </label>
-                  <label className="grid gap-1 text-sm">
+                  <label className="grid gap-1 text-base">
                     E-Mail
                     <input
                       type="email"
@@ -265,7 +267,7 @@ export default function TextPreviewPanels({
                       onChange={(e) => setContactEmail(e.target.value)}
                     />
                   </label>
-                  <label className="grid gap-1 text-sm">
+                  <label className="grid gap-1 text-base">
                     Telefonnummer (optional)
                     <input
                       type="tel"
@@ -275,7 +277,7 @@ export default function TextPreviewPanels({
                       onChange={(e) => setContactPhone(e.target.value)}
                     />
                   </label>
-                  <label className="grid gap-1 text-sm">
+                  <label className="grid gap-1 text-base">
                     Nachricht
                     <textarea
                       rows={3}
@@ -285,13 +287,13 @@ export default function TextPreviewPanels({
                       onChange={(e) => setContactMessage(e.target.value)}
                     />
                   </label>
-                  <p className="text-xs leading-5 text-amber-100/70">
+                  <p className="text-sm leading-6 text-amber-100/70">
                     Mit dem Absenden des Formulars erklaerst du dich damit
                     einverstanden, dass deine Angaben zur Bearbeitung deiner Anfrage
                     verarbeitet werden. Weitere Informationen findest du in unserer
                     Datenschutzerklärung.
                   </p>
-                  <p className="text-xs leading-5 text-amber-100/70">
+                  <p className="text-sm leading-6 text-amber-100/70">
                     Die über den Konfigurator übermittelten Anfragen stellen kein
                     verbindliches Angebot dar.
                   </p>
@@ -299,24 +301,24 @@ export default function TextPreviewPanels({
                     type="button"
                     onClick={onSendRequest}
                     disabled={!canSubmitRequest}
-                    className="mt-2 rounded bg-amber-200/20 px-4 py-2 text-sm font-medium text-amber-50 transition hover:bg-amber-200/30 disabled:cursor-not-allowed disabled:bg-stone-900/60 disabled:text-amber-100/50"
+                    className="mt-2 rounded bg-amber-200/20 px-4 py-2 text-base font-medium text-amber-50 transition hover:bg-amber-200/30 disabled:cursor-not-allowed disabled:bg-stone-900/60 disabled:text-amber-100/50"
                   >
                     {requestStatus === "sending"
                       ? "Wird gesendet..."
                       : "Auftragsanfrage abschicken"}
                   </button>
                   {!hasRunLaserTest && (
-                    <p className="text-xs text-amber-200">
+                    <p className="text-sm text-amber-200">
                       Lasertest erforderlich, bevor du die Anfrage absenden kannst.
                     </p>
                   )}
                   {requestStatus === "success" && (
-                    <p className="text-sm text-emerald-200">
+                    <p className="text-base text-emerald-200">
                       Anfrage wurde gesendet. Danke!
                     </p>
                   )}
                   {requestStatus === "error" && requestError && (
-                    <p className="text-sm text-rose-200">{requestError}</p>
+                    <p className="text-base text-rose-200">{requestError}</p>
                   )}
                 </form>
               </div>

@@ -2,7 +2,7 @@ import HeroHeader from "@/components/HeroHeader"
 
 export default function UeberMichPage() {
   return (
-    <div className="min-h-screen w-full bg-stone-100 pt-4">
+    <div className="min-h-screen w-full bg-transparent pt-4">
       <HeroHeader />
       <main className="w-full px-3 pb-6 pt-5 md:px-6 md:pt-7">
         <section className="mx-auto w-[90%] max-w-4xl text-stone-900">

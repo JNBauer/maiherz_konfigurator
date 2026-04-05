@@ -559,9 +559,7 @@ export default function TextPreview() {
   const showSceneLoading = !isSceneReady || (hasText && !parsedFont)
 
   return (
-    <div className="min-h-screen w-full bg-stone-100 pt-4">
-      <HeroHeader />
-
+    <div className="min-h-screen w-full bg-transparent">
       <main className="w-full px-3 pb-4 pt-5 md:px-6 md:pt-7">
         <TextPreviewScene
           anchorTransform={anchorTransform}

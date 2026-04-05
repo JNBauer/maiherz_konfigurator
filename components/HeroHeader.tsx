@@ -16,7 +16,7 @@ export default function HeroHeader() {
             <img
               src="/hero_text_maiherz.svg"
               alt="Kreiere dein persoenliches Maiherz"
-              className="h-28 w-auto md:h-44"
+              className="h-18 w-auto md:h-27"
             />
           </div>
 
@@ -24,21 +24,21 @@ export default function HeroHeader() {
             <div className="flex min-w-[12rem] flex-col items-stretch gap-2">
               <a
                 href="/ueber-mich"
-                className="rounded-full bg-amber-900/60 px-5 py-2 text-center text-sm font-medium text-amber-50 transition hover:bg-amber-900/70"
+                className="rounded-full border border-amber-200/20 bg-stone-950/50 px-5 py-2 text-center text-sm font-medium text-amber-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur transition hover:border-amber-200/40 hover:bg-stone-950/70"
               >
                 Über mich
               </a>
 
               <a
                 href="/"
-                className="rounded-full bg-amber-900/60 px-5 py-2 text-center text-sm font-medium text-amber-50 transition hover:bg-amber-900/70"
+                className="rounded-full border border-amber-200/20 bg-stone-950/50 px-5 py-2 text-center text-sm font-medium text-amber-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur transition hover:border-amber-200/40 hover:bg-stone-950/70"
               >
                 Konfigurator
               </a>
 
               <a
                 href="/acknowledgment"
-                className="rounded-full bg-amber-900/60 px-5 py-2 text-center text-sm font-medium text-amber-50 transition hover:bg-amber-900/70"
+                className="rounded-full border border-amber-200/20 bg-stone-950/50 px-5 py-2 text-center text-sm font-medium text-amber-50 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur transition hover:border-amber-200/40 hover:bg-stone-950/70"
               >
                 Danksagungen
               </a>

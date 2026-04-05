@@ -2,7 +2,7 @@ import HeroHeader from "@/components/HeroHeader"
 
 export default function AcknowledgmentPage() {
   return (
-    <div className="min-h-screen w-full bg-stone-100 pt-4">
+    <div className="min-h-screen w-full bg-transparent pt-4">
       <HeroHeader />
 
       <main className="w-full px-4 pb-10 pt-6 md:px-6 md:pt-8">

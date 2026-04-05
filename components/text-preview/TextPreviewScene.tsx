@@ -107,7 +107,7 @@ export default function TextPreviewScene({
   configuratorProps,
 }: TextPreviewSceneProps) {
   return (
-    <div className="relative mx-auto h-[82vh] min-h-[620px] w-[90%] overflow-hidden rounded-xl border border-stone-300 bg-stone-200">
+    <div className="relative mx-auto h-[82vh] min-h-[620px] w-[90%] overflow-hidden rounded-xl border border-amber-950/80 bg-stone-200">
       <Canvas
         shadows={{ type: THREE.PCFShadowMap }}
         camera={{ position: [0, 4, 14], fov: 45 }}
@@ -260,7 +260,7 @@ export default function TextPreviewScene({
             className="h-full w-full object-cover"
           />
           <div className="absolute inset-0 flex items-center justify-center bg-stone-950/30">
-            <div className="flex items-center gap-3 rounded-full border border-stone-300/60 bg-stone-900/70 px-4 py-2 text-sm text-amber-50 shadow-sm">
+            <div className="flex items-center gap-3 rounded-full border border-stone-300/60 bg-stone-900/70 px-4 py-2 text-base text-amber-50 shadow-sm">
               <span className="h-4 w-4 animate-spin rounded-full border-2 border-amber-200 border-t-transparent" />
               Lade 3D Szene...
             </div>
