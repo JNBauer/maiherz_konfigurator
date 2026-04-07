@@ -1,7 +1,6 @@
 "use client"
 
 import { Canvas, useThree } from "@react-three/fiber"
-import Image from "next/image"
 import { useEffect } from "react"
 import type { ComponentProps } from "react"
 import type { Font } from "three/examples/jsm/loaders/FontLoader.js"
@@ -25,6 +24,7 @@ import {
 type ConfiguratorProps = ComponentProps<typeof ConfiguratorPanel>
 
 type TextPreviewSceneProps = {
+  sceneImageSrc: string
   anchorTransform: AnchorTransform | null
   onLetterLevel: (obj: THREE.Object3D) => void
   onSceneReady: () => void
@@ -77,6 +77,7 @@ function ScreenshotBridge({
 }
 
 export default function TextPreviewScene({
+  sceneImageSrc,
   anchorTransform,
   onLetterLevel,
   onSceneReady,
@@ -256,12 +257,10 @@ export default function TextPreviewScene({
 
         {showSceneLoading && (
           <div className="pointer-events-none absolute inset-0 z-10 overflow-hidden">
-            <Image
-              src="/maiherz-scene.png"
+            <img
+              src={sceneImageSrc}
               alt="3D Szene Vorschau"
-              fill
-              sizes="90vw"
-              className="object-cover"
+              className="absolute inset-0 h-full w-full object-cover"
             />
             <div className="absolute inset-0 flex items-center justify-center bg-stone-950/30">
               <div className="flex items-center gap-3 rounded-full border border-stone-300/60 bg-stone-900/70 px-4 py-2 text-base text-amber-50 shadow-sm">

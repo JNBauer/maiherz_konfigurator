@@ -26,6 +26,10 @@ import {
   type TextMaterialKey,
 } from "./text-preview/helpers"
 
+type TextPreviewProps = {
+  sceneImageSrc: string
+}
+
 const MIN_TEXT_HEIGHT_CM = 5
 const MAX_TEXT_HEIGHT_CM = 22
 const DEFAULT_TEXT_HEIGHT_CM = 7.5
@@ -44,7 +48,7 @@ const HEART_VARIANTS = Array.from({ length: 8 }, (_, index) => {
 })
 const tabs = ["Design", "Vorschau"] as const
 
-export default function TextPreview() {
+export default function TextPreview({ sceneImageSrc }: TextPreviewProps) {
   const [nameValue, setNameValue] = useState("Name")
   const [textHeightCm, setTextHeightCm] = useState(DEFAULT_TEXT_HEIGHT_CM)
   const [includeHeart, setIncludeHeart] = useState(true)
@@ -605,6 +609,7 @@ export default function TextPreview() {
     <div className="min-h-screen w-full bg-transparent">
       <main className="w-full px-3 pb-4 pt-5 md:px-6 md:pt-7">
         <TextPreviewScene
+          sceneImageSrc={sceneImageSrc}
           anchorTransform={anchorTransform}
           onLetterLevel={handleLetterLevel}
           onSceneReady={() => setIsSceneReady(true)}

@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
-import Image from "next/image"
 import HeroHeader from "../components/HeroHeader"
 import TextPreview from "../components/TextPreview"
+import { getVersionedPublicAsset } from "../lib/getVersionedPublicAsset"
 
 export const metadata: Metadata = {
   title: "Maiherz Konfigurator | Dein persönliches Maiherz",
@@ -20,6 +20,8 @@ export const metadata: Metadata = {
 }
 
 export default function Home() {
+  const sceneImageSrc = getVersionedPublicAsset("/maiherz-scene.png")
+
   const faqJsonLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -91,6 +93,8 @@ export default function Home() {
               <p className="mt-3 text-base leading-7 text-amber-100/80">
                 Der Konfigurator zeigt dir dein Herz direkt in 3D und hilft dir,
                 Proportionen, Wirkung und Platzbedarf realistisch einzuschätzen.
+                Bestimme das Holz und die Schriftart deiner Wahl und erstelle so
+                etwas ganz Individuelles für deinen Lieblingsmenschen.
               </p>
             </article>
             <article
@@ -101,9 +105,9 @@ export default function Home() {
                 So geht&apos;s
               </h2>
               <p className="mt-3 text-base leading-7 text-amber-100/80">
-                Wähle Schrift, Größe, Material und Herzform. Prüfe den Text im
-                Herz, berechne eine grobe Fläche und sende deine Anfrage mit
-                einem Klick.
+                Wähle Schrift, Größe, Material bzw. Holzart und Herzform. Prüfe den Text im
+                Herz, berechne einen groben Preis und sende deine Anfrage mit
+                einem Klick, oder drucke sie dir als Schablone aus.
               </p>
             </article>
             <article
@@ -132,7 +136,7 @@ export default function Home() {
         </div>
       </section>
 
-      <TextPreview />
+      <TextPreview sceneImageSrc={sceneImageSrc} />
 
       <section className="w-full px-3 pb-10 pt-8 md:px-6 md:pt-10">
         <div className="mx-auto grid w-[90%] gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
@@ -140,12 +144,10 @@ export default function Home() {
             className="relative min-h-[320px] overflow-hidden rounded-xl border border-amber-200/20 bg-stone-950/30 bg-center bg-cover bg-blend-multiply shadow-[0_18px_45px_rgba(0,0,0,0.35)] md:min-h-[380px]"
             style={{ backgroundImage: "url('/plywood_diff_1k_darkened.jpg')" }}
           >
-            <Image
-              src="/maiherz-scene.png"
+            <img
+              src={sceneImageSrc}
               alt="3D Vorschau eines personalisierten Maiherzens"
-              fill
-              sizes="(max-width: 1024px) 90vw, 45vw"
-              className="object-cover"
+              className="absolute inset-0 h-full w-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-stone-950/85 via-stone-950/10 to-transparent" />
             <figcaption className="relative px-4 py-3 text-sm text-amber-100/80">
@@ -191,9 +193,9 @@ export default function Home() {
               </h3>
               <p className="mt-2 text-base leading-7 text-amber-100/80">
                 Du bestimmst Schrift, Größe, Material und Herzform. Ob schlicht,
-                verspielt oder mit Gravur – dein Maiherz wird exakt nach deinen
+                verspielt oder mit Gravur – dein Maiherz aus Holz wird exakt nach deinen
                 Vorstellungen gefertigt. So kannst du dich entspannt zurücklehnen und
-                weißt genau, was du am Ende erhältst.
+                weißt genau, wie dein individuelles Holz-Maiherz am Ende aussehen wird.
               </p>
             </article>
 
@@ -206,9 +208,10 @@ export default function Home() {
               </h3>
               <p className="mt-2 text-base leading-7 text-amber-100/80">
                 Der Laserschnitt sorgt für präzise Konturen und saubere Kanten – auch
-                bei feinen Details. Du kannst zwischen MDF, Multiplex und Acryl sowie
-                verschiedenen Materialstärken wählen. Vorschau und Lasertest helfen dir,
-                dein Design sicher und stabil umzusetzen.
+                bei feinen Details. Bei Holz entstehen so saubere Schnittkanten
+                und ein hochwertiges Ergebnis. Du kannst zwischen MDF, Multiplex (Holz)
+                und Acryl sowie verschiedenen Materialstärken wählen. Vorschau und
+                Lasertest helfen dir, dein Design aus Holz sicher und stabil umzusetzen.
               </p>
             </article>
 
@@ -221,9 +224,10 @@ export default function Home() {
               </h3>
               <p className="mt-2 text-base leading-7 text-amber-100/80">
                 Vorteile: hohe Präzision, gleichmäßige Ergebnisse und flexible
-                Materialwahl. Grenzen: Sehr filigrane Schriften oder enge Innenräume
-                können empfindlich sein. Der Lasertest zeigt dir frühzeitig, ob dein
-                Entwurf stabil genug ist.
+                Materialwahl – besonders bei Holz sehr beliebt wegen der natürlichen Optik.
+                Grenzen: Sehr filigrane Schriften oder enge Innenräume können bei Holz
+                empfindlich sein. Der Lasertest zeigt dir frühzeitig, ob dein Entwurf stabil
+                genug ist.
               </p>
             </article>
 
@@ -237,8 +241,9 @@ export default function Home() {
               <p className="mt-2 text-base leading-7 text-amber-100/80">
                 Beim Download erhältst du eine maßstabsgetreue PDF-Schablone, die bei
                 größeren Formaten auf mehrere Seiten aufgeteilt ist. Achte darauf, den
-                Ausdruck ohne Skalierung zu drucken. Für die Laserfertigung ist es
-                erforderlich, vor dem Absenden den Lasertest durchzuführen.
+                Ausdruck ohne Skalierung zu drucken. Für die Laserfertigung von Holz ist es
+                erforderlich, vor dem Absenden den Lasertest durchzuführen, um ein sauberes
+                und stabiles Ergebnis zu gewährleisten.
               </p>
             </article>
           </div>

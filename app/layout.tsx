@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import localFont from "next/font/local"
 import Script from "next/script"
 import SiteFooter from "@/components/SiteFooter"
+import { getVersionedPublicAsset } from "@/lib/getVersionedPublicAsset"
 import "./globals.css"
 
 const geistSans = localFont({
@@ -17,6 +18,7 @@ const geistMono = localFont({
 })
 
 const SITE_URL = "https://mai-herz.de"
+const sceneImageUrl = getVersionedPublicAsset("/maiherz-scene.png")
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -53,7 +55,7 @@ export const metadata: Metadata = {
       "Gestalte dein persönliches Maiherz mit 3D Vorschau, Materialien und Lasercheck.",
     images: [
       {
-        url: "/maiherz-scene.png",
+        url: sceneImageUrl,
         alt: "3D Vorschau eines personalisierten Maiherzens",
       },
     ],
@@ -63,7 +65,7 @@ export const metadata: Metadata = {
     title: "Maiherz Konfigurator",
     description:
       "Gestalte dein persönliches Maiherz mit 3D Vorschau, Materialien und Lasercheck.",
-    images: ["/maiherz-scene.png"],
+    images: [sceneImageUrl],
   },
   robots: {
     index: true,
