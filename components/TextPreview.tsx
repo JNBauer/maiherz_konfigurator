@@ -369,6 +369,7 @@ export default function TextPreview() {
           email: contactEmail.trim(),
           phone: contactPhone.trim(),
           message: contactMessage.trim(),
+          roughPriceEur,
           includeHeart,
           heartVariant,
           heartWidthCm,

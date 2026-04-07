@@ -20,19 +20,6 @@ export const metadata: Metadata = {
 }
 
 export default function Home() {
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    name: "Maiherz Konfigurator",
-    description:
-      "Konfigurator für personalisierte Maiherzen mit 3D Vorschau, Materialauswahl und Lasercheck.",
-    brand: {
-      "@type": "Brand",
-      name: "mai-herz.de",
-    },
-    category: "Handmade Decor",
-  }
-
   const faqJsonLd = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -389,10 +376,6 @@ export default function Home() {
         </div>
       </section>
 
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}

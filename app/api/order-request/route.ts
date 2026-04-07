@@ -11,6 +11,7 @@ type RequestBody = {
   email: string
   phone?: string
   message?: string
+  roughPriceEur?: number
   includeHeart: boolean
   heartVariant: string
   heartWidthCm: number
@@ -77,6 +78,16 @@ export async function POST(request: Request) {
       ? basename(body.heartVariant, ".svg")
       : "n/a"
 
+    const priceFormatter = new Intl.NumberFormat("de-DE", {
+      style: "currency",
+      currency: "EUR",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })
+    const priceLine = Number.isFinite(body.roughPriceEur)
+      ? `Preis (ca.): ${priceFormatter.format(body.roughPriceEur as number)}`
+      : null
+
     const summaryLines = [
       `Name: ${body.fullName}`,
       `E-Mail: ${body.email}`,
@@ -97,6 +108,7 @@ export async function POST(request: Request) {
       `Text Dicke: ${body.textThicknessMm} mm`,
       `Spacing: ${body.spacing}`,
       `Font: ${body.selectedFontFile}`,
+      priceLine,
     ].filter((line): line is string => Boolean(line))
 
     const summary = summaryLines.join("\n")
