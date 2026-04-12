@@ -20,7 +20,7 @@ export default function ImpressumPage() {
             <p>
               Julian Bauer<br />
               Provinzialstraße 26<br />
-              53850 Niederkassel<br />
+              53859 Niederkassel<br />
               Deutschland
             </p>
           </div>
@@ -46,7 +46,7 @@ export default function ImpressumPage() {
             <p>
               Julian Bauer<br />
               Provinzialstraße 26<br />
-              53850 Niederkassel<br />
+              53859 Niederkassel<br />
               Deutschland
             </p>
           </div>
